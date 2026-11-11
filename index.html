@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f3ed">
+    <title>One Network, Two Decisions</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="story-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Common Ground home">
+          <span class="brand-mark" aria-hidden="true">+</span>
+          <span>COMMON GROUND <span class="brand-divider">/</span> OPERATIONS LAB</span>
+        </a>
+        <div class="live-label"><span class="live-dot"></span> INTERACTIVE CASE STUDY</div>
+      </header>
+
+      <div class="presentation-grid">
+        <nav class="story-nav" aria-label="Demonstration stages">
+          <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
+          <button class="stage-link is-active" data-stage="0" aria-current="step"><span>01</span> The network</button>
+          <button class="stage-link" data-stage="1"><span>02</span> The first answer</button>
+          <button class="stage-link" data-stage="2"><span>03</span> Add fairness</button>
+        </nav>
+
+        <div class="story-column">
+          <section class="intro">
+            <p class="eyebrow">A FOOD-BANK NETWORK, RECONSIDERED</p>
+            <h1>One network.<br><span>Two different decisions.</span></h1>
+            <p class="intro-copy">A model can find the cheapest way to move food. But does “optimal” mean every community gets a fair share?</p>
+          </section>
+
+          <section class="stage-copy" aria-live="polite">
+            <div class="stage-kicker" id="stageKicker">THE CHALLENGE <span>01 / 03</span></div>
+            <h2 id="stageTitle">Three communities. One limited supply.</h2>
+            <p id="stageDescription">Food arrives at two distribution hubs. Each community has a different need—and every mile costs money.</p>
+          </section>
+        </div>
+
+        <div class="demo-column">
+          <section class="workspace" aria-label="Food bank allocation model">
+        <article class="panel network-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-label">LIVE NETWORK</p>
+              <h3>Regional food flow</h3>
+            </div>
+            <span class="network-status" id="networkStatus">DEMAND</span>
+          </div>
+          <div class="network-wrap">
+            <svg class="network" viewBox="0 0 640 370" role="img" aria-labelledby="networkTitle networkDesc">
+              <title id="networkTitle">Food-bank supply and community network</title>
+              <desc id="networkDesc">Two supply hubs connect to three community food banks. Allocation labels update as the model changes.</desc>
+              <g class="route-lines">
+                <path d="M142 91 C236 91 250 140 326 166"></path>
+                <path d="M142 91 C252 91 344 103 467 142"></path>
+                <path d="M142 91 C239 129 253 222 185 264"></path>
+                <path d="M498 91 C406 91 392 140 326 166"></path>
+                <path d="M498 91 C409 91 379 103 467 142"></path>
+                <path d="M498 91 C403 129 391 222 185 264"></path>
+              </g>
+              <g class="route-pulses" aria-hidden="true">
+                <circle r="4"><animateMotion dur="4s" repeatCount="indefinite" path="M142 91 C236 91 250 140 326 166"></animateMotion></circle>
+                <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" path="M498 91 C403 129 391 222 185 264"></animateMotion></circle>
+              </g>
+              <g class="hub">
+                <circle cx="142" cy="91" r="31"></circle>
+                <text x="142" y="88" class="hub-icon">+</text>
+                <text x="142" y="143" class="node-name">NORTH HUB</text>
+                <text x="142" y="162" class="node-detail">600 crates</text>
+              </g>
+              <g class="hub">
+                <circle cx="498" cy="91" r="31"></circle>
+                <text x="498" y="88" class="hub-icon">+</text>
+                <text x="498" y="143" class="node-name">SOUTH HUB</text>
+                <text x="498" y="162" class="node-detail">400 crates</text>
+              </g>
+              <g class="community community-north">
+                <circle cx="326" cy="185" r="39"></circle>
+                <text x="326" y="182" class="community-icon">N</text>
+                <text x="326" y="241" class="node-name">NORTHSIDE</text>
+                <text x="326" y="260" class="node-detail">Need 800</text>
+                <text x="326" y="287" class="allocation-label" data-allocation="north">—</text>
+              </g>
+              <g class="community community-central">
+                <circle cx="467" cy="185" r="39"></circle>
+                <text x="467" y="182" class="community-icon">C</text>
+                <text x="467" y="241" class="node-name">CENTRAL</text>
+                <text x="467" y="260" class="node-detail">Need 600</text>
+                <text x="467" y="287" class="allocation-label" data-allocation="central">—</text>
+              </g>
+              <g class="community community-south">
+                <circle cx="185" cy="264" r="39"></circle>
+                <text x="185" y="261" class="community-icon">S</text>
+                <text x="185" y="320" class="node-name">SOUTHSIDE</text>
+                <text x="185" y="339" class="node-detail">Need 500</text>
+                <text x="185" y="366" class="allocation-label" data-allocation="south">—</text>
+              </g>
+              <g class="network-caption">
+                <text x="14" y="26">SUPPLY</text>
+                <text x="562" y="26">COMMUNITY</text>
+              </g>
+            </svg>
+          </div>
+          <div class="network-legend">
+            <span><i class="legend-line"></i> Delivery route</span>
+            <span><i class="legend-dot"></i> Allocation updates live</span>
+          </div>
+        </article>
+
+        <article class="panel model-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-label">THE MATHEMATICAL MODEL</p>
+              <h3 id="modelHeading">Optimization model</h3>
+            </div>
+            <span class="model-tag">SIMULATED LP · 1,000 CRATES</span>
+          </div>
+          <div class="model-content">
+            <div class="equation-block">
+              <span class="equation-label">DECISION VARIABLES</span>
+              <p class="equation">x<sub>ij</sub> = crates from hub <i>i</i> to community <i>j</i></p>
+            </div>
+            <div class="equation-block">
+              <span class="equation-label">OBJECTIVE <span class="constraint-badge existing">EXISTING</span></span>
+              <p class="equation">minimize <span class="math-emphasis">Σ c<sub>ij</sub>x<sub>ij</sub></span> <small>lowest delivery cost</small></p>
+            </div>
+            <div class="equation-block">
+              <span class="equation-label">CONSTRAINTS</span>
+              <ul class="constraint-list">
+                <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Ship only available supply</span><span class="constraint-badge existing">EXISTING</span></li>
+                <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Respect community demand</span><span class="constraint-badge existing">EXISTING</span></li>
+                <li class="constraint-row fairness-row" id="fairnessRow" hidden>
+                  <span class="constraint-check new-check">+</span>
+                  <span class="constraint-formula">Σ<sub>i</sub>x<sub>ij</sub> ≥ <strong id="constraintThreshold">25%</strong> · 1,000 crates <small>for each community j</small></span>
+                  <span class="constraint-badge new-badge">NEW</span>
+                </li>
+              </ul>
+            </div>
+            <div class="model-insight" id="modelInsight">
+              <span class="insight-icon" aria-hidden="true">✳</span>
+              <p id="insightText">Every route and demand is visible. The question is what “best” should mean.</p>
+              <button id="insightButton" class="text-button" type="button">A model note <span aria-hidden="true">+</span></button>
+            </div>
+          </div>
+        </article>
+          </section>
+
+          <section class="results panel" id="resultsPanel" aria-label="Allocation results" hidden>
+        <div class="results-heading">
+          <div>
+            <p class="panel-label">THE DECISION, MADE VISIBLE</p>
+            <h3 id="resultsTitle">Original cost-optimal allocation</h3>
+          </div>
+          <div class="metric-group">
+            <div class="metric"><span>TOTAL COST</span><strong id="costMetric">$1,840</strong></div>
+            <div class="metric"><span>LEAST-SERVED AREA</span><strong id="serviceMetric">15%</strong></div>
+          </div>
+        </div>
+        <div class="allocation-list" id="allocationList">
+          <div class="allocation-row" data-community="north">
+            <span class="allocation-name"><i class="community-swatch north-swatch"></i>Northside</span>
+            <div class="bar-track"><div class="bar-fill north-fill" data-bar="north"></div></div>
+            <span class="allocation-value" data-value="north">—</span>
+          </div>
+          <div class="allocation-row" data-community="central">
+            <span class="allocation-name"><i class="community-swatch central-swatch"></i>Central</span>
+            <div class="bar-track"><div class="bar-fill central-fill" data-bar="central"></div></div>
+            <span class="allocation-value" data-value="central">—</span>
+          </div>
+          <div class="allocation-row" data-community="south">
+            <span class="allocation-name"><i class="community-swatch south-swatch"></i>Southside</span>
+            <div class="bar-track"><div class="bar-fill south-fill" data-bar="south"></div></div>
+            <span class="allocation-value" data-value="south">—</span>
+          </div>
+        </div>
+        <div class="comparison-note" id="comparisonNote" hidden>
+          <span class="comparison-arrow" aria-hidden="true">↗</span>
+          <p>Same 1,000 crates. The model now protects a minimum share for every community.</p>
+        </div>
+          </section>
+
+          <section class="fairness-control" id="fairnessControl" hidden>
+        <div>
+          <label for="fairnessSlider">Minimum share per community</label>
+          <p>Adjust the new constraint and watch the same network respond.</p>
+        </div>
+        <div class="slider-wrap">
+          <input id="fairnessSlider" type="range" min="20" max="30" step="1" value="25" aria-describedby="sliderHint">
+          <div class="slider-meta"><span>20%</span><output id="fairnessOutput" for="fairnessSlider">25%</output><span>30%</span></div>
+        </div>
+        <span class="sr-only" id="sliderHint">Each community is guaranteed at least this percentage of all available crates.</span>
+          </section>
+        </div>
+      </div>
+
+      <footer class="presenter-controls">
+        <button class="back-button" id="backButton" type="button" disabled><span aria-hidden="true">←</span> Back</button>
+        <span class="presenter-hint" id="presenterHint">Presenter controlled · advance when ready</span>
+        <button class="next-button" id="nextButton" type="button"><span id="nextLabel">Reveal the first answer</span><span aria-hidden="true">→</span></button>
+      </footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
