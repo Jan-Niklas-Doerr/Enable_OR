@@ -4,7 +4,7 @@ const stages = [
     chatTitle: 'Ask me to build the model',
     modelHeading: 'Problem statement',
     next: null,
-    suggestions: ['Build the optimization model'],
+    suggestions: ['Formulate this as a Python optimization model using Gurobi'],
   },
   {
     kicker: 'BASELINE SOLUTION',
@@ -184,7 +184,10 @@ function renderSuggestions(questions) {
     button.type = 'button';
     button.dataset.question = question;
     button.textContent = question;
-    button.addEventListener('click', () => askModel(question));
+    button.addEventListener('click', () => {
+      button.remove();
+      askModel(question);
+    });
     chatSuggestions.append(button);
   });
 }
@@ -458,19 +461,30 @@ function formatChange(value) {
   return value > 1e-6 ? `+${formatted}` : value < -1e-6 ? `−${formatted}` : '0.0';
 }
 
+function communityTotals(flows) {
+  const totals = { north: 0, central: 0, south: 0 };
+  Object.values(flows).forEach((routes) => {
+    Object.entries(routes).forEach(([community, crates]) => {
+      totals[community] += crates;
+    });
+  });
+  return totals;
+}
+
+function describeCommunityChanges(baselineFlows, scenarioFlows) {
+  const baseline = communityTotals(baselineFlows);
+  const scenario = communityTotals(scenarioFlows);
+  const names = { north: 'Northside', central: 'Central', south: 'Southside' };
+  return Object.keys(names)
+    .map((community) =>
+      `${names[community]} ${formatNumber(baseline[community], 1)} → ${formatNumber(scenario[community], 1)} (${formatChange(scenario[community] - baseline[community])})`,
+    )
+    .join('; ');
+}
+
 function renderScenarioAllocation(container, baseline, scenario) {
-  const baseAllocations = { north: 0, central: 0, south: 0 };
-  const nextAllocations = { north: 0, central: 0, south: 0 };
-  Object.values(baseline.flows).forEach((routes) => {
-    Object.entries(routes).forEach(([community, crates]) => {
-      baseAllocations[community] += crates;
-    });
-  });
-  Object.values(scenario.flows).forEach((routes) => {
-    Object.entries(routes).forEach(([community, crates]) => {
-      nextAllocations[community] += crates;
-    });
-  });
+  const baseAllocations = communityTotals(baseline.flows);
+  const nextAllocations = communityTotals(scenario.flows);
 
   container.replaceChildren();
   Object.entries(baseAllocations).forEach(([community, before]) => {
@@ -623,7 +637,7 @@ async function answerModelQuestion(question) {
     if (!/(model|formulat|translat|optim|decision variable|linear program)/i.test(question)) {
       return 'I can help with that. First, ask me to build the optimization model from the supply, demand, route costs, and budget shown here.';
     }
-    return 'I’ve formulated a linear program using the data shown: choose six route flows, maximize total deliveries, and keep each hub’s shipments, each community’s deliveries, and total route cost within their limits. The route costs are 1, 3, 4 from North Hub and 3, 2, 3 from South Hub. I’ll show the exact equations next; press Solve when you’re ready for Gurobi to calculate the allocation.';
+    return 'I’ve prepared the Python optimization model for Gurobi using the data shown: choose six route flows, maximize total deliveries, and keep each hub’s shipments, each community’s deliveries, and total route cost within their limits. The route costs are 1, 3, 4 from North Hub and 3, 2, 3 from South Hub. I’ll show the exact equations next; press Solve when you’re ready for Gurobi to calculate the allocation.';
   }
   if (currentStage === 1 && !baselineSolution) {
     return 'The full model is ready, but it has not been solved yet. Press “Solve baseline” and I can explain the resulting allocation.';
@@ -649,12 +663,15 @@ async function answerModelQuestion(question) {
     if (currentStage === 4) renderSupplyScenario(scenarios);
     const best = scenarios.best_hub;
     const other = scenarios.hub_supply_scenarios.find((item) => item.hub !== best.hub);
-    if (best.delivery_change < 1e-6 && other.delivery_change < 1e-6) {
-      return `With the current ${formatNumber(selectedFloor)}% floor and 1,400-unit budget, adding ${formatNumber(best.supply_increase)} crates at either hub does not increase deliveries. The budget—not supply—is limiting this solution.`;
-    }
-    const otherName = other.hub === 'north_hub' ? 'North Hub' : 'South Hub';
+    const baselineDeliveries = scenarios.baseline.total_deliveries;
+    const bestDeliveries = baselineDeliveries + best.delivery_change;
+    const otherDeliveries = baselineDeliveries + other.delivery_change;
     const bestName = best.hub === 'north_hub' ? 'North Hub' : 'South Hub';
-    return `At the current ${formatNumber(selectedFloor)}% floor, I re-solved both cases with ${formatNumber(best.supply_increase)} extra crates and the same budget. ${bestName} changes deliveries by ${formatChange(best.delivery_change)}; ${otherName} by ${formatChange(other.delivery_change)} crates.`;
+    const otherName = other.hub === 'north_hub' ? 'North Hub' : 'South Hub';
+    if (best.delivery_change < 1e-6 && other.delivery_change < 1e-6) {
+      return `At the ${formatNumber(selectedFloor)}% floor, the baseline delivers ${formatNumber(baselineDeliveries, 1)} crates. Adding ${formatNumber(best.supply_increase)} crates at ${bestName} or ${otherName} leaves deliveries unchanged at ${formatNumber(bestDeliveries, 1)} and ${formatNumber(otherDeliveries, 1)}. With the budget fixed at 1,400 units, extra supply does not increase deliveries in these scenarios.`;
+    }
+    return `At the ${formatNumber(selectedFloor)}% floor, the baseline delivers ${formatNumber(baselineDeliveries, 1)} crates. With ${formatNumber(best.supply_increase)} extra crates and the same 1,400-unit budget, deliveries become ${formatNumber(bestDeliveries, 1)} at ${bestName} (${formatChange(best.delivery_change)}) or ${formatNumber(otherDeliveries, 1)} at ${otherName} (${formatChange(other.delivery_change)}). At ${bestName}, community allocations change: ${describeCommunityChanges(scenarios.baseline.flows, best.flows)}.`;
   }
 
   if ([2, 3].includes(currentStage) && /cost|route|arc|cheaper|reduce|sensitivity/.test(text)) {
@@ -668,10 +685,13 @@ async function answerModelQuestion(question) {
     if (currentStage === 3) renderRouteScenario(scenarios);
     const routeName = `${best.hub === 'north_hub' ? 'North Hub' : 'South Hub'} to ${best.community[0].toUpperCase()}${best.community.slice(1)}`;
     const routeLabel = requested ? routeName : `the ${routeName} route`;
+    const baselineDeliveries = scenarios.baseline.total_deliveries;
+    const scenarioDeliveries = baselineDeliveries + best.delivery_change;
+    const communityChanges = describeCommunityChanges(scenarios.baseline.flows, best.flows);
     if (best.delivery_change > 1e-6) {
-      return `At the selected ${formatNumber(selectedFloor)}% floor, a 25% cost cut on ${routeLabel} changes deliveries by ${formatChange(best.delivery_change)} crates. Gurobi re-optimizes all route flows under the same budget.`;
+      return `At the ${formatNumber(selectedFloor)}% floor, cutting ${routeLabel} from ${formatNumber(best.original_unit_cost, 2)} to ${formatNumber(best.reduced_unit_cost, 2)} cost units raises total deliveries from ${formatNumber(baselineDeliveries, 1)} to ${formatNumber(scenarioDeliveries, 1)} (${formatChange(best.delivery_change)}). Community allocations change: ${communityChanges}. The budget stays at 1,400 units.`;
     }
-    return `At the selected ${formatNumber(selectedFloor)}% floor, a 25% cost cut on ${routeLabel} does not increase deliveries. Gurobi re-optimizes all route flows, so the effect depends on the full network.`;
+    return `At the ${formatNumber(selectedFloor)}% floor, cutting ${routeLabel} from ${formatNumber(best.original_unit_cost, 2)} to ${formatNumber(best.reduced_unit_cost, 2)} cost units leaves total deliveries at ${formatNumber(baselineDeliveries, 1)}. Community allocations change: ${communityChanges}. Gurobi re-optimizes the full network under the same 1,400-unit budget.`;
   }
 
   if (currentStage <= 2 && /why.*south|south.*nothing|southside/.test(text)) {

@@ -37,7 +37,7 @@
               <span class="scripted-dot" title="Scripted, solver-grounded demo"></span>
             </div>
             <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
-              <div class="chat-message assistant-message">I can turn the supply, demand, route costs, and budget into the optimization model used in this demonstration.</div>
+              <div class="chat-message assistant-message">I can formulate the supply, demand, route costs, and budget as a Python optimization model using Gurobi.</div>
             </div>
             <div class="chat-suggestions" id="chatSuggestions" aria-label="Suggested questions"></div>
             <form class="chat-form" id="chatForm">
@@ -216,7 +216,7 @@
                     <option value="south_hub|south">South Hub → Southside</option>
                   </select>
                 </label>
-                <button class="solve-button scenario-button" id="routeScenarioButton" type="button">Re-optimize route costs <span aria-hidden="true">→</span></button>
+                <button class="solve-button scenario-button" id="routeScenarioButton" type="button">Run route-cost scenario <span aria-hidden="true">→</span></button>
                 <p class="scenario-status" id="routeScenarioStatus" aria-live="polite">Choose a route and run the scenario to see the new allocation.</p>
                 <div class="scenario-result" id="routeScenarioResult" hidden>
                   <div class="scenario-metrics">
@@ -234,7 +234,7 @@
                   <p>Add 200 crates at one hub while keeping the same budget and fairness floor. Compare both locations to see whether extra supply can actually be used.</p>
                   <p class="scenario-context">Compared with the optimized allocation at <strong data-current-floor>15%</strong> minimum share.</p>
                 </div>
-                <button class="solve-button scenario-button" id="supplyScenarioButton" type="button">Compare both hubs <span aria-hidden="true">→</span></button>
+                <button class="solve-button scenario-button" id="supplyScenarioButton" type="button">Run extra-supply comparison <span aria-hidden="true">→</span></button>
                 <p class="scenario-status" id="supplyScenarioStatus" aria-live="polite">Run the comparison to see which hub’s extra supply changes deliveries.</p>
                 <div class="scenario-result" id="supplyScenarioResult" hidden>
                   <div class="supply-comparisons" id="supplyComparisons"></div>

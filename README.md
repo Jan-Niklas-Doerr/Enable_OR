@@ -4,9 +4,9 @@ This presenter-led demo tells one continuous optimization story across five
 stages: frame the food-bank problem, solve a budget-capped allocation, add a
 controllable minimum-share rule, then explore route-cost and added-supply
 sensitivity in separate tabs. The same network stays visible throughout.
-Asking the scripted assistant to formulate the model reveals the equations
-and advances to the baseline tab. After the baseline solve, asking to introduce
-fairness opens the fairness tab, where the presenter sets the minimum share.
+Asking the scripted assistant to formulate the Python/Gurobi model reveals the
+equations and advances to the baseline tab. After the baseline solve, asking to
+introduce fairness opens the fairness tab, where the presenter sets the minimum share.
 Model solves and what-if comparisons remain explicit presenter actions.
 
 Run the local server from the `orllmbench` environment, then open
