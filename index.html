@@ -20,8 +20,8 @@
       <div class="presentation-grid">
         <nav class="story-nav" aria-label="Demonstration stages">
           <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
-          <button class="stage-link is-active" data-stage="0" aria-current="step"><span>01</span> Frame the problem</button>
-          <button class="stage-link" data-stage="1"><span>02</span> Solve the network</button>
+          <button class="stage-link is-active" data-stage="0" aria-current="step"><span>01</span> The challenge</button>
+          <button class="stage-link" data-stage="1"><span>02</span> Build the model</button>
           <button class="stage-link" data-stage="2"><span>03</span> Add fairness</button>
         </nav>
 
@@ -41,13 +41,13 @@
           <section class="chat-card" aria-label="Simulated conversation">
             <div class="chat-card-heading">
               <div>
-                <p class="panel-label">A CONVERSATION ABOUT THE MODEL</p>
-                <h3>Decision partner</h3>
+                <p class="panel-label">MODEL ASSISTANT · SCRIPTED DIALOGUE</p>
+                <h3 id="chatTitle">Ask for the formulation</h3>
               </div>
               <span class="scripted-dot" title="Scripted, solver-grounded demo"></span>
             </div>
             <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
-              <div class="chat-message assistant-message">Describe the problem and I’ll translate it into a model.</div>
+              <div class="chat-message assistant-message">Ask me to formulate the food-allocation problem. I’ll show the model Gurobi solves.</div>
             </div>
             <div class="chat-suggestions" id="chatSuggestions" aria-label="Suggested questions"></div>
             <form class="chat-form" id="chatForm">
@@ -55,7 +55,7 @@
               <input id="chatInput" name="question" type="text" maxlength="240" placeholder="Ask about this decision…" autocomplete="off" required>
               <button type="submit" aria-label="Send question">Send</button>
             </form>
-            <p class="chat-disclaimer">Simulated conversation · answers grounded in Gurobi results</p>
+            <p class="chat-disclaimer">Scripted responses · actual allocations from Gurobi</p>
           </section>
         </div>
 
@@ -70,61 +70,61 @@
                 <span class="network-status" id="networkStatus">PROBLEM</span>
               </div>
               <div class="network-wrap">
-                <svg class="network" viewBox="0 0 640 390" role="img" aria-labelledby="networkTitle networkDesc">
+                <svg class="network" viewBox="0 0 700 500" role="img" aria-labelledby="networkTitle networkDesc">
                   <title id="networkTitle">Food-bank supply and community network</title>
                   <desc id="networkDesc">Two square supply hubs connect to three communities. Route-variable labels and allocation totals update after each solve.</desc>
                   <g class="route-lines">
-                    <path data-route-line="north_hub-north" d="M140 107 C250 104 368 82 500 84"></path>
-                    <path data-route-line="north_hub-central" d="M140 107 C258 120 372 185 500 194"></path>
-                    <path data-route-line="north_hub-south" d="M140 107 C260 171 376 292 500 304"></path>
-                    <path data-route-line="south_hub-north" d="M140 286 C264 221 374 100 500 84"></path>
-                    <path data-route-line="south_hub-central" d="M140 286 C262 273 374 211 500 194"></path>
-                    <path data-route-line="south_hub-south" d="M140 286 C266 292 374 305 500 304"></path>
+                    <path data-route-line="north_hub-north" d="M152 132 C260 119 380 95 520 95"></path>
+                    <path data-route-line="north_hub-central" d="M152 132 C270 166 383 241 520 250"></path>
+                    <path data-route-line="north_hub-south" d="M152 132 C277 228 390 362 520 405"></path>
+                    <path data-route-line="south_hub-north" d="M152 382 C270 302 389 148 520 95"></path>
+                    <path data-route-line="south_hub-central" d="M152 382 C280 350 390 276 520 250"></path>
+                    <path data-route-line="south_hub-south" d="M152 382 C278 395 390 405 520 405"></path>
                   </g>
                   <g class="route-pulses" aria-hidden="true">
-                    <circle r="4"><animateMotion dur="4s" repeatCount="indefinite" path="M140 107 C250 104 368 82 500 84"></animateMotion></circle>
-                    <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" path="M140 286 C262 273 374 211 500 194"></animateMotion></circle>
+                    <circle r="5"><animateMotion dur="4s" repeatCount="indefinite" path="M152 132 C260 119 380 95 520 95"></animateMotion></circle>
+                    <circle r="5"><animateMotion dur="5s" repeatCount="indefinite" path="M152 382 C280 350 390 276 520 250"></animateMotion></circle>
                   </g>
                   <g class="route-labels" id="routeLabels">
-                    <g class="route-label" data-route="north_hub-north" transform="translate(300 57)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_NN = —</text></g>
-                    <g class="route-label" data-route="north_hub-central" transform="translate(310 140)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_NC = —</text></g>
-                    <g class="route-label" data-route="north_hub-south" transform="translate(315 230)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_NS = —</text></g>
-                    <g class="route-label" data-route="south_hub-north" transform="translate(392 126)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_SN = —</text></g>
-                    <g class="route-label" data-route="south_hub-central" transform="translate(385 250)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_SC = —</text></g>
-                    <g class="route-label" data-route="south_hub-south" transform="translate(315 345)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_SS = —</text></g>
+                    <g class="route-label" data-route="north_hub-north" transform="translate(320 74)"><rect x="-48" y="-12" width="96" height="24" rx="5"></rect><text>x_NN = —</text></g>
+                    <g class="route-label" data-route="north_hub-central" transform="translate(300 190)"><rect x="-48" y="-12" width="96" height="24" rx="5"></rect><text>x_NC = —</text></g>
+                    <g class="route-label" data-route="north_hub-south" transform="translate(300 310)"><rect x="-48" y="-12" width="96" height="24" rx="5"></rect><text>x_NS = —</text></g>
+                    <g class="route-label" data-route="south_hub-north" transform="translate(450 145)"><rect x="-48" y="-12" width="96" height="24" rx="5"></rect><text>x_SN = —</text></g>
+                    <g class="route-label" data-route="south_hub-central" transform="translate(440 325)"><rect x="-48" y="-12" width="96" height="24" rx="5"></rect><text>x_SC = —</text></g>
+                    <g class="route-label" data-route="south_hub-south" transform="translate(350 448)"><rect x="-48" y="-12" width="96" height="24" rx="5"></rect><text>x_SS = —</text></g>
                   </g>
                   <g class="hub">
-                    <rect x="76" y="76" width="64" height="64" rx="5"></rect>
-                    <text x="108" y="115" class="hub-icon">+</text>
-                    <text x="108" y="158" class="node-name">NORTH HUB</text>
-                    <text x="108" y="174" class="node-detail" data-supply="north_hub">Supply 600</text>
+                    <rect x="72" y="88" width="80" height="80" rx="6"></rect>
+                    <text x="112" y="140" class="hub-icon">+</text>
+                    <text x="112" y="190" class="node-name">NORTH HUB</text>
+                    <text x="112" y="209" class="node-detail" data-supply="north_hub">Supply 600</text>
                   </g>
                   <g class="hub">
-                    <rect x="76" y="254" width="64" height="64" rx="5"></rect>
-                    <text x="108" y="293" class="hub-icon">+</text>
-                    <text x="108" y="337" class="node-name">SOUTH HUB</text>
-                    <text x="108" y="353" class="node-detail" data-supply="south_hub">Supply 400</text>
+                    <rect x="72" y="342" width="80" height="80" rx="6"></rect>
+                    <text x="112" y="394" class="hub-icon">+</text>
+                    <text x="112" y="447" class="node-name">SOUTH HUB</text>
+                    <text x="112" y="466" class="node-detail" data-supply="south_hub">Supply 400</text>
                   </g>
                   <g class="community community-north">
-                    <circle cx="520" cy="84" r="25"></circle>
-                    <text x="520" y="90" class="community-icon">N</text>
-                    <text x="555" y="77" class="node-name" text-anchor="start">NORTHSIDE</text>
-                    <text x="555" y="93" class="node-detail" text-anchor="start">Need 800</text>
-                    <text x="555" y="109" class="allocation-label" data-allocation="north" text-anchor="start">—</text>
+                    <circle cx="552" cy="95" r="34"></circle>
+                    <text x="552" y="102" class="community-icon">N</text>
+                    <text x="598" y="80" class="node-name" text-anchor="start">NORTHSIDE</text>
+                    <text x="598" y="101" class="node-detail" text-anchor="start">Need 800</text>
+                    <text x="598" y="122" class="allocation-label" data-allocation="north" text-anchor="start">—</text>
                   </g>
                   <g class="community community-central">
-                    <circle cx="520" cy="194" r="25"></circle>
-                    <text x="520" y="200" class="community-icon">C</text>
-                    <text x="555" y="187" class="node-name" text-anchor="start">CENTRAL</text>
-                    <text x="555" y="203" class="node-detail" text-anchor="start">Need 600</text>
-                    <text x="555" y="219" class="allocation-label" data-allocation="central" text-anchor="start">—</text>
+                    <circle cx="552" cy="250" r="34"></circle>
+                    <text x="552" y="257" class="community-icon">C</text>
+                    <text x="598" y="235" class="node-name" text-anchor="start">CENTRAL</text>
+                    <text x="598" y="256" class="node-detail" text-anchor="start">Need 600</text>
+                    <text x="598" y="277" class="allocation-label" data-allocation="central" text-anchor="start">—</text>
                   </g>
                   <g class="community community-south">
-                    <circle cx="520" cy="304" r="25"></circle>
-                    <text x="520" y="310" class="community-icon">S</text>
-                    <text x="555" y="297" class="node-name" text-anchor="start">SOUTHSIDE</text>
-                    <text x="555" y="313" class="node-detail" text-anchor="start">Need 500</text>
-                    <text x="555" y="329" class="allocation-label" data-allocation="south" text-anchor="start">—</text>
+                    <circle cx="552" cy="405" r="34"></circle>
+                    <text x="552" y="412" class="community-icon">S</text>
+                    <text x="598" y="390" class="node-name" text-anchor="start">SOUTHSIDE</text>
+                    <text x="598" y="411" class="node-detail" text-anchor="start">Need 500</text>
+                    <text x="598" y="432" class="allocation-label" data-allocation="south" text-anchor="start">—</text>
                   </g>
                 </svg>
               </div>
@@ -139,13 +139,18 @@
                 <div>
                   <p class="panel-label">FROM STORY TO MATHEMATICS</p>
                   <h3 id="modelHeading">Problem statement</h3>
+                  <p class="model-stage-note" id="modelStageNote">The route variables and delivery objective are unchanged.</p>
                 </div>
                 <span class="model-tag">Gurobi · LP</span>
               </div>
               <div class="problem-content" id="problemPanel">
                 <p>Two hubs have <strong>1,000 crates</strong> to distribute. Northside, Central, and Southside need <strong>1,900 crates</strong> in total.</p>
-                <p>Each route has a different illustrative cost. <mark>Choose how much to send on each route</mark> without exceeding hub supply, community demand, or the <strong>1,400-unit budget</strong>.</p>
-                <div class="problem-prompt"><span aria-hidden="true">↳</span> What allocation delivers the most food?</div>
+                <p>Each route has a per-crate cost. <mark>Choose how much to send on each route</mark> without exceeding hub supply, community demand, or the <strong>1,400-unit budget</strong>.</p>
+                <div class="route-costs" aria-label="Illustrative cost per crate on each route">
+                  <span>North Hub costs</span><strong>Northside 1 · Central 3 · Southside 4</strong>
+                  <span>South Hub costs</span><strong>Northside 3 · Central 2 · Southside 3</strong>
+                </div>
+                <div class="problem-prompt"><span aria-hidden="true">↳</span> Ask the assistant to formulate the model.</div>
               </div>
               <div class="model-content" id="modelPanel" hidden>
                 <div class="equation-block decision-block">
@@ -154,14 +159,15 @@
                 </div>
                 <div class="equation-block objective-block">
                   <span class="equation-label">OBJECTIVE <span class="constraint-badge existing">SAME IN BOTH SOLVES</span></span>
-                  <p class="equation">maximize <span class="math-emphasis">Σ<sub>i,j</sub> x<sub>ij</sub></span> <small>total deliveries</small></p>
+                  <p class="equation">maximize <span class="math-emphasis">x<sub>NN</sub> + x<sub>NC</sub> + x<sub>NS</sub> + x<sub>SN</sub> + x<sub>SC</sub> + x<sub>SS</sub></span></p>
                 </div>
                 <div class="equation-block constraint-block">
-                  <span class="equation-label">CONSTRAINTS</span>
+                  <span class="equation-label">SUPPLY, DEMAND &amp; BUDGET CONSTRAINTS</span>
                   <ul class="constraint-list">
-                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Σ<sub>j</sub> x<sub>ij</sub> ≤ supply<sub>i</sub></span><span class="constraint-badge existing">SUPPLY</span></li>
-                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Σ<sub>i</sub> x<sub>ij</sub> ≤ demand<sub>j</sub></span><span class="constraint-badge existing">DEMAND</span></li>
-                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Σ<sub>i,j</sub> c<sub>ij</sub>x<sub>ij</sub> ≤ 1,400</span><span class="constraint-badge existing">BUDGET</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + x<sub>NC</sub> + x<sub>NS</sub> ≤ 600</span><span class="constraint-badge existing">NORTH HUB</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>SN</sub> + x<sub>SC</sub> + x<sub>SS</sub> ≤ 400</span><span class="constraint-badge existing">SOUTH HUB</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + x<sub>SN</sub> ≤ 800 · x<sub>NC</sub> + x<sub>SC</sub> ≤ 600 · x<sub>NS</sub> + x<sub>SS</sub> ≤ 500</span><span class="constraint-badge existing">DEMAND</span></li>
+                    <li class="constraint-row existing-row budget-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + 3x<sub>NC</sub> + 4x<sub>NS</sub> + 3x<sub>SN</sub> + 2x<sub>SC</sub> + 3x<sub>SS</sub> ≤ 1,400</span><span class="constraint-badge existing">BUDGET</span></li>
                     <li class="constraint-row fairness-row" id="fairnessRow" hidden>
                       <span class="constraint-check new-check">+</span>
                       <span class="constraint-formula">Σ<sub>i</sub>x<sub>ij</sub> ≥ <strong id="constraintThreshold">15%</strong> · Σ<sub>i,j</sub>x<sub>ij</sub> <small>for every community j · share of actual deliveries</small></span>
@@ -169,7 +175,7 @@
                     </li>
                   </ul>
                 </div>
-                <p class="model-footnote">c<sub>ij</sub> are illustrative route-cost units—not dollars. x<sub>ij</sub> ≥ 0.</p>
+                <p class="model-footnote">Route costs are illustrative units, not dollars. All route flows x<sub>ij</sub> ≥ 0.</p>
                 <div class="solve-row">
                   <p id="solveStatus" aria-live="polite">Ready when you are. Review each route variable above.</p>
                   <button class="solve-button" id="solveButton" type="button">Solve baseline <span aria-hidden="true">→</span></button>
@@ -201,7 +207,7 @@
           <section class="fairness-control" id="fairnessControl" hidden>
             <div>
               <label for="fairnessSlider">Minimum share of actual deliveries</label>
-              <p>Change the new rule, then explicitly re-solve the model.</p>
+              <p id="fairnessStatus">Change the new rule, then explicitly re-solve the model.</p>
             </div>
             <div class="slider-wrap">
               <input id="fairnessSlider" type="range" min="5" max="30" step="1" value="15" aria-describedby="sliderHint">

@@ -4,8 +4,8 @@ const stages = [
     title: 'Three communities. One limited supply.',
     description: 'Two food hubs can deliver 1,000 crates to three communities requesting 1,900. Which routes should carry the food?',
     status: 'PROBLEM',
-    next: 'Take this problem to the model',
-    suggestions: ['How do you model this problem?'],
+    next: '',
+    suggestions: ['Build the optimization model'],
   },
   {
     kicker: 'THE FIRST SOLVE',
@@ -189,21 +189,28 @@ function addConversationTurn(question, answer) {
 
 function setStageStatus(text) {
   document.getElementById('solveStatus').textContent = text;
+  document.getElementById('fairnessStatus').textContent = text;
 }
 
 function renderStage(stage) {
   currentStage = Math.max(0, Math.min(stages.length - 1, stage));
   solveRequest += 1;
   const content = stages[currentStage];
+  document.querySelector('.story-shell').dataset.stage = currentStage;
   document.getElementById('stageKicker').innerHTML =
     `${content.kicker} <span>0${currentStage + 1} / 03</span>`;
   document.getElementById('stageTitle').textContent = content.title;
   document.getElementById('stageDescription').textContent = content.description;
-  document.getElementById('modelHeading').textContent =
-    currentStage === 0 ? 'Problem statement' : 'The optimization model';
+  document.getElementById('chatTitle').textContent =
+    currentStage === 0 ? 'Ask for the formulation' : 'Model assistant';
+  document.getElementById('modelHeading').textContent = currentStage === 0
+    ? 'Problem statement'
+    : currentStage === 2 ? 'The added fairness constraint' : 'The optimization model';
+  document.getElementById('modelStageNote').textContent =
+    currentStage === 2 ? 'The objective and route variables stay unchanged.' : '';
   document.getElementById('progressFill').style.width = `${currentStage * 50}%`;
   document.getElementById('backButton').disabled = currentStage === 0;
-  document.getElementById('nextButton').hidden = currentStage === stages.length - 1;
+  document.getElementById('nextButton').hidden = !content.next;
   document.getElementById('nextLabel').textContent = content.next;
   document.getElementById('presenterHint').textContent = currentStage === 2
     ? 'Presenter controlled · change the rule, then re-solve'
@@ -258,12 +265,6 @@ function renderStage(stage) {
   }
   renderSuggestions(content.suggestions);
 
-  if (currentStage === 1 && !baselineCache.has('baseline')) {
-    addConversationTurn(
-      'Can you translate this story into a decision model?',
-      'Yes. I’ll choose a flow xᵢⱼ on each route, maximize total crates delivered, and respect supply, demand, and the 1,400-unit budget.',
-    );
-  }
   if (currentStage === 2) {
     addConversationTurn(
       `What if every community must receive at least ${slider.value}% of deliveries?`,
@@ -365,7 +366,10 @@ function matchRequestedRoute(question, scenarios) {
 async function answerModelQuestion(question) {
   const text = question.toLowerCase();
   if (currentStage === 0) {
-    return 'There are 6 possible routes. I’ll create one decision variable per route, then choose flows that respect each hub’s supply, each community’s demand, and the shared budget.';
+    if (!/(model|formulat|translat|optim|decision variable|linear program)/i.test(question)) {
+      return 'I can help with that. First, ask me to build the optimization model from the supply, demand, route costs, and budget shown here.';
+    }
+    return 'I’ve formulated a linear program using the data shown: choose six route flows, maximize total deliveries, and keep each hub’s shipments, each community’s deliveries, and total route cost within their limits. The route costs are 1, 3, 4 from North Hub and 3, 2, 3 from South Hub. I’ll show the exact equations next; press Solve when you’re ready for Gurobi to calculate the allocation.';
   }
   if (currentStage === 1 && !baselineSolution) {
     return 'The full model is ready, but it has not been solved yet. Press “Solve baseline” and I can explain the resulting allocation.';
@@ -444,14 +448,23 @@ async function answerModelQuestion(question) {
 async function askModel(question) {
   const trimmed = question.trim();
   if (!trimmed) return;
+  const asksForModel = currentStage === 0
+    && /(model|formulat|translat|optim|decision variable|linear program)/i.test(trimmed);
   conversationQueue = conversationQueue.then(async () => {
     addChatMessage(trimmed, 'user');
-    const thinking = addChatMessage('Let me check the current model…', 'thinking');
+    const thinking = addChatMessage(
+      asksForModel ? 'Translating the stated data into an LP…' : 'Let me check the current model…',
+      'thinking',
+    );
     try {
       const answer = await answerModelQuestion(trimmed);
       await wait(180);
       thinking.remove();
       addChatMessage(answer, 'assistant');
+      if (asksForModel && currentStage === 0) {
+        await wait(500);
+        renderStage(1);
+      }
     } catch (error) {
       thinking.remove();
       addChatMessage(`I could not complete that comparison: ${error.message}`, 'assistant');
@@ -497,7 +510,3 @@ document.getElementById('chatForm').addEventListener('submit', (event) => {
 
 renderSuggestions(stages[0].suggestions);
 renderStage(0);
-addConversationTurn(
-  'We have more need than food. Where should we start?',
-  'Let’s map the two hubs, the three communities, their supply and demand, and the cost of each possible route.',
-);

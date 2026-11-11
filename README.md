@@ -3,8 +3,9 @@
 This presenter-led demo tells one continuous optimization story across three
 stages: frame the food-bank problem, solve a budget-capped allocation, and add
 a minimum-share fairness rule. The same network stays visible throughout.
-Stage changes, model solves, and fairness re-solves are all presenter-triggered;
-the interface never advances automatically.
+In the first stage, asking the scripted assistant to formulate the model
+reveals the equations and advances to the model tab. No solve is run until the
+presenter presses Solve; fairness changes also require an explicit re-solve.
 
 Run the local server from the `orllmbench` environment, then open
 `http://127.0.0.1:8000/`. Do not open `index.html` directly: the browser needs
@@ -59,9 +60,11 @@ the recommended hub is determined by the current solve results.
 
 ## Conversation and presentation
 
-The conversation is simulated and makes no external LLM calls. Scripted
-responses use the active Gurobi results; what-if questions call the local
-counterfactual endpoint. Answers appear in concise turns rather than
-character-by-character typing. The 16:9 desktop layout preserves the network,
-model, allocations, and conversation together, with a responsive stacked
-layout on smaller screens.
+The conversation is simulated and makes no external LLM calls. Its model
+formulation is scripted to match the displayed supplies, demands, costs, and
+budget; Gurobi solves that corresponding LP when requested. Allocation and
+what-if answers use actual local solver results. This is a staged demonstration,
+not arbitrary natural-language-to-model generation. Responses appear in
+concise turns rather than character-by-character typing. The 16:9 desktop
+layout preserves the network, model, allocations, and conversation together,
+with a responsive stacked layout on smaller screens.
