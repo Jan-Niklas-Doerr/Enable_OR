@@ -1,21 +1,17 @@
 # Food-bank allocation demonstration
 
+This presenter-led demo tells one continuous optimization story across three
+stages: frame the food-bank problem, solve a budget-capped allocation, and add
+a minimum-share fairness rule. The same network stays visible throughout.
+Stage changes, model solves, and fairness re-solves are all presenter-triggered;
+the interface never advances automatically.
+
 Run the local server from the `orllmbench` environment, then open
 `http://127.0.0.1:8000/`. Do not open `index.html` directly: the browser needs
 the local API to ask Gurobi to solve the model.
 
-In VS Code, select `orllmbench` as the workspace Python interpreter. Alternatively,
-activate it in a terminal before running the commands below.
-
-## Gurobi model
-
-`server.py` serves the presentation and its same-origin `/api/solve` endpoint.
-The endpoint calls `food_bank_model.py` in the server's Python process; no
-additional web framework or service is required. Bindings default to localhost.
-Select the existing `orllmbench` environment, which must have `gurobipy` and a
-working Gurobi license, before starting the server.
-
-From the repository root:
+In VS Code, select `orllmbench` as the workspace Python interpreter. The
+environment must have `gurobipy` and a working Gurobi license.
 
 ```powershell
 conda activate orllmbench
@@ -26,33 +22,46 @@ In another terminal using the same environment:
 
 ```powershell
 python food_bank_model.py
-python food_bank_model.py --fairness 25
+python food_bank_model.py --fairness 15
 python -m unittest discover -s tests -v
 ```
 
-The commands print a JSON solution: the cost, flows on all six routes, totals
-per community, and each constraint's slack, shadow price, and allowable
-right-hand-side range. A `null` range endpoint means the bound is infinite.
-Sensitivity ranges and shadow prices describe the optimal LP basis and apply
-to a change in **one constraint's right-hand side at a time**. Changing the
-fairness slider changes three right-hand sides simultaneously, so re-solve
-the model rather than extrapolating from an individual range. The model uses
-simplex so that a basis is available for sensitivity analysis.
+## Optimization model
 
-The model shares the demo's supply (600 and 400 crates), community demands
-(800, 600, and 500), and six routes. It assumes all available crates must be
-shipped; otherwise, minimizing positive delivery costs alone would ship
-nothing. Allocations are continuous to support LP sensitivity analysis. The
-optional fairness constraint guarantees each community the specified
-percentage of the **total supply**, not of its individual demand. Values above
-one third are infeasible for the three communities and are reported as solver
-errors.
+The LP defines a continuous non-negative route variable `x_ij` for every hub
+and community pair. It maximizes total crates delivered subject to:
 
-Route costs are illustrative cost units, not measured dollar amounts. The
-browser now displays allocations, objective values, and sensitivity data from
-the live Gurobi solve. Moving the fairness slider triggers a new solve; a
-short debounce avoids needless requests while dragging.
+- Shipments out of each hub do not exceed its available supply (600 and 400
+  crates).
+- Deliveries to each community do not exceed its demand (800, 600, and 500
+  crates).
+- Total route cost does not exceed the illustrative 1,400-unit budget.
+- In the fairness stage, every community receives at least the selected
+  percentage of **actual total deliveries**.
 
-The Q&amp;A drawer is a scripted, rule-based demo, not an LLM integration. It
-answers a limited set of topics using the active solver results, with no
-external model calls.
+Route costs are illustrative units, not dollars. The fairness rule is linear:
+each community's allocation is constrained to be at least `p` times the sum
+of all route variables. Allocations are continuous to support LP sensitivity
+analysis.
+
+The CLI and `/api/solve` endpoint return route flows, community totals, budget
+use, constraint slacks and shadow prices, allowable RHS ranges, and route
+reduced costs. Sensitivity ranges and shadow prices describe the current
+optimal LP basis and apply to one constraint RHS change at a time. Fairness
+changes several coupled constraints, so the demo re-solves rather than
+extrapolating sensitivity values.
+
+The `/api/what-if` endpoint compares fresh Gurobi solves: it reduces each
+route's unit cost by a selected percentage, and separately adds a selected
+amount of supply at each hub while keeping the budget unchanged. The UI uses
+these comparisons for its conversational route-cost and added-supply answers;
+the recommended hub is determined by the current solve results.
+
+## Conversation and presentation
+
+The conversation is simulated and makes no external LLM calls. Scripted
+responses use the active Gurobi results; what-if questions call the local
+counterfactual endpoint. Answers appear in concise turns rather than
+character-by-character typing. The 16:9 desktop layout preserves the network,
+model, allocations, and conversation together, with a responsive stacked
+layout on smaller screens.

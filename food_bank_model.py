@@ -1,4 +1,4 @@
-"""Gurobi linear program for the food-bank presentation."""
+"""Gurobi allocation model and deterministic what-if comparisons."""
 
 from __future__ import annotations
 
@@ -13,8 +13,10 @@ from gurobipy import GRB
 
 SUPPLY = {"north_hub": 600, "south_hub": 400}
 DEMAND = {"north": 800, "central": 600, "south": 500}
-
-# Illustrative delivery costs per crate, not observed transport costs.
+BUDGET = 1400.0
+FAIRNESS_DEFAULT = 15.0
+FAIRNESS_MIN = 0.0
+FAIRNESS_MAX = 30.0
 COST = {
     ("north_hub", "north"): 1.0,
     ("north_hub", "central"): 3.0,
@@ -26,12 +28,13 @@ COST = {
 
 
 class OptimizationError(RuntimeError):
-    """The solver did not return an optimal solution."""
+    """The solver did not find an optimal allocation."""
 
 
 def _finite_bound(value: float) -> float | None:
-    """Represent Gurobi's infinite sensitivity bounds as JSON null."""
-    return None if abs(value) >= GRB.INFINITY else value
+    if abs(value) >= GRB.INFINITY:
+        return None
+    return value
 
 
 def _constraint_result(constraint: gp.Constr) -> dict[str, Any]:
@@ -47,101 +50,213 @@ def _constraint_result(constraint: gp.Constr) -> dict[str, Any]:
     }
 
 
-def solve(fairness_percent: float | None = None) -> dict[str, Any]:
-    """Solve the baseline, or guarantee each community a share of total supply.
-
-    The fairness percentage is a percentage of the total available crates,
-    not a percentage of each community's demand.
-    """
+def _validate_inputs(
+    fairness_percent: float | None,
+    budget: float,
+    supply_increase: dict[str, float] | None = None,
+    route_costs: dict[tuple[str, str], float] | None = None,
+) -> None:
+    if not math.isfinite(budget) or budget <= 0:
+        raise ValueError("budget must be finite and greater than zero")
     if fairness_percent is not None and (
         not math.isfinite(fairness_percent)
-        or not 0 <= fairness_percent <= 100
+        or not FAIRNESS_MIN <= fairness_percent <= FAIRNESS_MAX
     ):
-        raise ValueError("fairness_percent must be a finite number between 0 and 100")
+        raise ValueError(
+            f"fairness_percent must be between {FAIRNESS_MIN:g} and {FAIRNESS_MAX:g}"
+        )
+    if supply_increase:
+        if set(supply_increase) - set(SUPPLY):
+            raise ValueError("supply_increase contains an unknown hub")
+        if any(not math.isfinite(amount) or amount < 0 for amount in supply_increase.values()):
+            raise ValueError("supply increases must be finite and non-negative")
+    if route_costs:
+        if set(route_costs) - set(COST):
+            raise ValueError("route_costs contains an unknown route")
+        if any(not math.isfinite(value) or value <= 0 for value in route_costs.values()):
+            raise ValueError("route costs must be finite and greater than zero")
 
-    total_supply = sum(SUPPLY.values())
+
+def solve(
+    fairness_percent: float | None = None,
+    budget: float = BUDGET,
+    supply_increase: dict[str, float] | None = None,
+    route_costs: dict[tuple[str, str], float] | None = None,
+) -> dict[str, Any]:
+    """Maximize total deliveries within a budget, with optional relative fairness.
+
+    The fairness rule guarantees each community at least the requested
+    percentage of actual total deliveries, rather than total available supply.
+    """
+    _validate_inputs(fairness_percent, budget, supply_increase, route_costs)
+    supply = {
+        hub: amount + (supply_increase or {}).get(hub, 0)
+        for hub, amount in SUPPLY.items()
+    }
+    costs = {route: (route_costs or {}).get(route, base) for route, base in COST.items()}
+
     with gp.Env(empty=True) as env:
         env.setParam("OutputFlag", 0)
         env.start()
-        return _solve_with_env(env, fairness_percent, total_supply)
-
-
-def _solve_with_env(
-    env: gp.Env, fairness_percent: float | None, total_supply: int
-) -> dict[str, Any]:
-    with gp.Model("food_bank_allocation", env=env) as model:
-        # A simplex solution supplies the basis required for sensitivity ranges.
-        model.Params.Method = 1
-
-        flow = model.addVars(SUPPLY, DEMAND, lb=0, vtype=GRB.CONTINUOUS, name="flow")
-        model.setObjective(
-            gp.quicksum(COST[hub, community] * flow[hub, community]
-                        for hub in SUPPLY for community in DEMAND),
-            GRB.MINIMIZE,
-        )
-
-        constraints: dict[str, gp.Constr] = {}
-        for hub, supply in SUPPLY.items():
-            constraints[f"supply_{hub}"] = model.addConstr(
-                gp.quicksum(flow[hub, community] for community in DEMAND) == supply,
-                name=f"supply_{hub}",
+        with gp.Model("food_bank_allocation", env=env) as model:
+            model.Params.Method = 1
+            flow = model.addVars(SUPPLY, DEMAND, lb=0, vtype=GRB.CONTINUOUS, name="x")
+            allocation = {
+                community: gp.quicksum(flow[hub, community] for hub in SUPPLY)
+                for community in DEMAND
+            }
+            total_deliveries = gp.quicksum(allocation.values())
+            total_cost = gp.quicksum(
+                costs[hub, community] * flow[hub, community]
+                for hub in SUPPLY for community in DEMAND
             )
-        for community, demand in DEMAND.items():
-            allocation = gp.quicksum(flow[hub, community] for hub in SUPPLY)
-            constraints[f"demand_{community}"] = model.addConstr(
-                allocation <= demand, name=f"demand_{community}"
-            )
+            model.setObjective(total_deliveries, GRB.MAXIMIZE)
+
+            constraints: dict[str, gp.Constr] = {}
+            for hub, available in supply.items():
+                constraints[f"supply_{hub}"] = model.addConstr(
+                    gp.quicksum(flow[hub, community] for community in DEMAND) <= available,
+                    name=f"supply_{hub}",
+                )
+            for community, demand in DEMAND.items():
+                constraints[f"demand_{community}"] = model.addConstr(
+                    allocation[community] <= demand, name=f"demand_{community}"
+                )
+            constraints["budget"] = model.addConstr(total_cost <= budget, name="budget")
+
             if fairness_percent is not None:
-                constraints[f"fairness_{community}"] = model.addConstr(
-                    allocation >= total_supply * fairness_percent / 100,
-                    name=f"fairness_{community}",
+                share = fairness_percent / 100
+                for community in DEMAND:
+                    constraints[f"fairness_{community}"] = model.addConstr(
+                        allocation[community] >= share * total_deliveries,
+                        name=f"fairness_{community}",
+                    )
+
+            model.optimize()
+            if model.Status != GRB.OPTIMAL:
+                raise OptimizationError(
+                    f"Gurobi did not find an optimal solution (status {model.Status})"
                 )
 
-        model.optimize()
-        if model.Status != GRB.OPTIMAL:
-            raise OptimizationError(
-                f"Gurobi did not find an optimal solution (status {model.Status})"
-            )
-
-        flows = {
-            hub: {community: flow[hub, community].X for community in DEMAND}
-            for hub in SUPPLY
-        }
-        allocations = {
-            community: sum(flows[hub][community] for hub in SUPPLY)
-            for community in DEMAND
-        }
-        return {
-            "status": "optimal",
-            "fairness_percent": fairness_percent,
-            "supply": dict(SUPPLY),
-            "demand": dict(DEMAND),
-            "unit_costs": {
-                hub: {community: COST[hub, community] for community in DEMAND}
+            flows = {
+                hub: {community: flow[hub, community].X for community in DEMAND}
                 for hub in SUPPLY
+            }
+            allocations = {
+                community: sum(flows[hub][community] for hub in SUPPLY)
+                for community in DEMAND
+            }
+            total = sum(allocations.values())
+            used_budget = sum(
+                costs[hub, community] * flows[hub][community]
+                for hub in SUPPLY for community in DEMAND
+            )
+            return {
+                "status": "optimal",
+                "objective": "maximize_total_deliveries",
+                "fairness_percent": fairness_percent,
+                "supply": supply,
+                "demand": dict(DEMAND),
+                "unit_costs": {
+                    hub: {community: costs[hub, community] for community in DEMAND}
+                    for hub in SUPPLY
+                },
+                "total_supply": sum(supply.values()),
+                "total_demand": sum(DEMAND.values()),
+                "total_deliveries": total,
+                "budget": budget,
+                "budget_used": used_budget,
+                "budget_remaining": budget - used_budget,
+                "objective_cost": used_budget,
+                "flows": flows,
+                "allocations": allocations,
+                "constraints": {
+                    name: _constraint_result(constraint)
+                    for name, constraint in constraints.items()
+                },
+                "route_reduced_costs": {
+                    hub: {community: flow[hub, community].RC for community in DEMAND}
+                    for hub in SUPPLY
+                },
+            }
+
+
+def compare_what_ifs(
+    fairness_percent: float,
+    budget: float = BUDGET,
+    supply_increment: float = 200,
+    route_cost_reduction_percent: float = 25,
+) -> dict[str, Any]:
+    """Compare every route-cost reduction and added supply from each hub."""
+    if not math.isfinite(supply_increment) or supply_increment <= 0:
+        raise ValueError("supply_increment must be finite and greater than zero")
+    if (
+        not math.isfinite(route_cost_reduction_percent)
+        or not 0 < route_cost_reduction_percent < 100
+    ):
+        raise ValueError("route_cost_reduction_percent must be between 0 and 100")
+
+    baseline = solve(fairness_percent, budget)
+    route_scenarios = []
+    for (hub, community), original_cost in COST.items():
+        scenario = solve(
+            fairness_percent,
+            budget,
+            route_costs={
+                (hub, community): original_cost * (1 - route_cost_reduction_percent / 100)
             },
-            "total_supply": total_supply,
-            "objective_cost": model.ObjVal,
-            "flows": flows,
-            "allocations": allocations,
-            "constraints": {
-                name: _constraint_result(constraint)
-                for name, constraint in constraints.items()
-            },
-        }
+        )
+        route_scenarios.append({
+            "type": "route_cost",
+            "hub": hub,
+            "community": community,
+            "original_unit_cost": original_cost,
+            "reduced_unit_cost": original_cost * (1 - route_cost_reduction_percent / 100),
+            "deliveries": scenario["total_deliveries"],
+            "delivery_change": scenario["total_deliveries"] - baseline["total_deliveries"],
+            "budget_used": scenario["budget_used"],
+            "flows": scenario["flows"],
+        })
+
+    supply_scenarios = []
+    for hub in SUPPLY:
+        scenario = solve(
+            fairness_percent,
+            budget,
+            supply_increase={hub: supply_increment},
+        )
+        supply_scenarios.append({
+            "type": "hub_supply",
+            "hub": hub,
+            "supply_increase": supply_increment,
+            "deliveries": scenario["total_deliveries"],
+            "delivery_change": scenario["total_deliveries"] - baseline["total_deliveries"],
+            "budget_used": scenario["budget_used"],
+            "flows": scenario["flows"],
+        })
+
+    return {
+        "baseline": baseline,
+        "route_cost_reduction_percent": route_cost_reduction_percent,
+        "route_scenarios": route_scenarios,
+        "hub_supply_scenarios": supply_scenarios,
+        "best_route": max(
+            route_scenarios,
+            key=lambda item: (item["deliveries"], -item["budget_used"]),
+        ),
+        "best_hub": max(
+            supply_scenarios,
+            key=lambda item: (item["deliveries"], -item["budget_used"]),
+        ),
+    }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--fairness",
-        type=float,
-        metavar="PERCENT",
-        help="minimum percentage of total supply allocated to each community",
-    )
+    parser.add_argument("--fairness", type=float)
+    parser.add_argument("--budget", type=float, default=BUDGET)
     args = parser.parse_args()
-    result = solve(args.fairness)
-    print(json.dumps(result, indent=2, allow_nan=False))
+    print(json.dumps(solve(args.fairness, args.budget), indent=2, allow_nan=False))
 
 
 if __name__ == "__main__":

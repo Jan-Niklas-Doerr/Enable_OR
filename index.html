@@ -20,215 +20,204 @@
       <div class="presentation-grid">
         <nav class="story-nav" aria-label="Demonstration stages">
           <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
-          <button class="stage-link is-active" data-stage="0" aria-current="step"><span>01</span> The network</button>
-          <button class="stage-link" data-stage="1"><span>02</span> The first answer</button>
+          <button class="stage-link is-active" data-stage="0" aria-current="step"><span>01</span> Frame the problem</button>
+          <button class="stage-link" data-stage="1"><span>02</span> Solve the network</button>
           <button class="stage-link" data-stage="2"><span>03</span> Add fairness</button>
         </nav>
 
         <div class="story-column">
           <section class="intro">
             <p class="eyebrow">A FOOD-BANK NETWORK, RECONSIDERED</p>
-            <h1>One network.<br><span>Two different decisions.</span></h1>
-            <p class="intro-copy">A model can find the cheapest way to move food. But does “optimal” mean every community gets a fair share?</p>
+            <h1>One network.<br><span>Better decisions.</span></h1>
+            <p class="intro-copy">A live optimization story: define the problem, solve it, then change one rule and see what happens.</p>
           </section>
 
           <section class="stage-copy" aria-live="polite">
             <div class="stage-kicker" id="stageKicker">THE CHALLENGE <span>01 / 03</span></div>
             <h2 id="stageTitle">Three communities. One limited supply.</h2>
-            <p id="stageDescription">Food arrives at two distribution hubs. Each community has a different need—and every mile costs money.</p>
+            <p id="stageDescription">Two food hubs can deliver 1,000 crates to three communities requesting 1,900. Which routes should carry the food?</p>
+          </section>
+
+          <section class="chat-card" aria-label="Simulated conversation">
+            <div class="chat-card-heading">
+              <div>
+                <p class="panel-label">A CONVERSATION ABOUT THE MODEL</p>
+                <h3>Decision partner</h3>
+              </div>
+              <span class="scripted-dot" title="Scripted, solver-grounded demo"></span>
+            </div>
+            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+              <div class="chat-message assistant-message">Describe the problem and I’ll translate it into a model.</div>
+            </div>
+            <div class="chat-suggestions" id="chatSuggestions" aria-label="Suggested questions"></div>
+            <form class="chat-form" id="chatForm">
+              <label class="sr-only" for="chatInput">Ask a question about this model</label>
+              <input id="chatInput" name="question" type="text" maxlength="240" placeholder="Ask about this decision…" autocomplete="off" required>
+              <button type="submit" aria-label="Send question">Send</button>
+            </form>
+            <p class="chat-disclaimer">Simulated conversation · answers grounded in Gurobi results</p>
           </section>
         </div>
 
         <div class="demo-column">
           <section class="workspace" aria-label="Food bank allocation model">
-        <article class="panel network-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="panel-label">LIVE NETWORK</p>
-              <h3>Regional food flow</h3>
-            </div>
-            <span class="network-status" id="networkStatus">DEMAND</span>
-          </div>
-          <div class="network-wrap">
-            <svg class="network" viewBox="0 0 640 370" role="img" aria-labelledby="networkTitle networkDesc">
-              <title id="networkTitle">Food-bank supply and community network</title>
-              <desc id="networkDesc">Two supply hubs connect to three community food banks. Allocation labels update as the model changes.</desc>
-              <g class="route-lines">
-                <path d="M142 91 C236 91 250 140 326 166"></path>
-                <path d="M142 91 C252 91 344 103 467 142"></path>
-                <path d="M142 91 C239 129 253 222 185 264"></path>
-                <path d="M498 91 C406 91 392 140 326 166"></path>
-                <path d="M498 91 C409 91 379 103 467 142"></path>
-                <path d="M498 91 C403 129 391 222 185 264"></path>
-              </g>
-              <g class="route-pulses" aria-hidden="true">
-                <circle r="4"><animateMotion dur="4s" repeatCount="indefinite" path="M142 91 C236 91 250 140 326 166"></animateMotion></circle>
-                <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" path="M498 91 C403 129 391 222 185 264"></animateMotion></circle>
-              </g>
-              <g class="hub">
-                <circle cx="142" cy="91" r="31"></circle>
-                <text x="142" y="88" class="hub-icon">+</text>
-                <text x="142" y="143" class="node-name">NORTH HUB</text>
-                <text x="142" y="162" class="node-detail">600 crates</text>
-              </g>
-              <g class="hub">
-                <circle cx="498" cy="91" r="31"></circle>
-                <text x="498" y="88" class="hub-icon">+</text>
-                <text x="498" y="143" class="node-name">SOUTH HUB</text>
-                <text x="498" y="162" class="node-detail">400 crates</text>
-              </g>
-              <g class="community community-north">
-                <circle cx="326" cy="185" r="39"></circle>
-                <text x="326" y="182" class="community-icon">N</text>
-                <text x="326" y="241" class="node-name">NORTHSIDE</text>
-                <text x="326" y="260" class="node-detail">Need 800</text>
-                <text x="326" y="287" class="allocation-label" data-allocation="north">—</text>
-              </g>
-              <g class="community community-central">
-                <circle cx="467" cy="185" r="39"></circle>
-                <text x="467" y="182" class="community-icon">C</text>
-                <text x="467" y="241" class="node-name">CENTRAL</text>
-                <text x="467" y="260" class="node-detail">Need 600</text>
-                <text x="467" y="287" class="allocation-label" data-allocation="central">—</text>
-              </g>
-              <g class="community community-south">
-                <circle cx="185" cy="264" r="39"></circle>
-                <text x="185" y="261" class="community-icon">S</text>
-                <text x="185" y="320" class="node-name">SOUTHSIDE</text>
-                <text x="185" y="339" class="node-detail">Need 500</text>
-                <text x="185" y="366" class="allocation-label" data-allocation="south">—</text>
-              </g>
-              <g class="network-caption">
-                <text x="14" y="26">SUPPLY</text>
-                <text x="562" y="26">COMMUNITY</text>
-              </g>
-            </svg>
-          </div>
-          <div class="network-legend">
-            <span><i class="legend-line"></i> Delivery route</span>
-            <span><i class="legend-dot"></i> Allocation updates live</span>
-          </div>
-        </article>
+            <article class="panel network-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-label">ONE NETWORK · LIVE ALLOCATION</p>
+                  <h3>Regional food flow</h3>
+                </div>
+                <span class="network-status" id="networkStatus">PROBLEM</span>
+              </div>
+              <div class="network-wrap">
+                <svg class="network" viewBox="0 0 640 390" role="img" aria-labelledby="networkTitle networkDesc">
+                  <title id="networkTitle">Food-bank supply and community network</title>
+                  <desc id="networkDesc">Two square supply hubs connect to three communities. Route-variable labels and allocation totals update after each solve.</desc>
+                  <g class="route-lines">
+                    <path data-route-line="north_hub-north" d="M140 107 C250 104 368 82 500 84"></path>
+                    <path data-route-line="north_hub-central" d="M140 107 C258 120 372 185 500 194"></path>
+                    <path data-route-line="north_hub-south" d="M140 107 C260 171 376 292 500 304"></path>
+                    <path data-route-line="south_hub-north" d="M140 286 C264 221 374 100 500 84"></path>
+                    <path data-route-line="south_hub-central" d="M140 286 C262 273 374 211 500 194"></path>
+                    <path data-route-line="south_hub-south" d="M140 286 C266 292 374 305 500 304"></path>
+                  </g>
+                  <g class="route-pulses" aria-hidden="true">
+                    <circle r="4"><animateMotion dur="4s" repeatCount="indefinite" path="M140 107 C250 104 368 82 500 84"></animateMotion></circle>
+                    <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" path="M140 286 C262 273 374 211 500 194"></animateMotion></circle>
+                  </g>
+                  <g class="route-labels" id="routeLabels">
+                    <g class="route-label" data-route="north_hub-north" transform="translate(300 57)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_NN = —</text></g>
+                    <g class="route-label" data-route="north_hub-central" transform="translate(310 140)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_NC = —</text></g>
+                    <g class="route-label" data-route="north_hub-south" transform="translate(315 230)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_NS = —</text></g>
+                    <g class="route-label" data-route="south_hub-north" transform="translate(392 126)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_SN = —</text></g>
+                    <g class="route-label" data-route="south_hub-central" transform="translate(385 250)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_SC = —</text></g>
+                    <g class="route-label" data-route="south_hub-south" transform="translate(315 345)"><rect x="-45" y="-10" width="90" height="19" rx="4"></rect><text>x_SS = —</text></g>
+                  </g>
+                  <g class="hub">
+                    <rect x="76" y="76" width="64" height="64" rx="5"></rect>
+                    <text x="108" y="115" class="hub-icon">+</text>
+                    <text x="108" y="158" class="node-name">NORTH HUB</text>
+                    <text x="108" y="174" class="node-detail" data-supply="north_hub">Supply 600</text>
+                  </g>
+                  <g class="hub">
+                    <rect x="76" y="254" width="64" height="64" rx="5"></rect>
+                    <text x="108" y="293" class="hub-icon">+</text>
+                    <text x="108" y="337" class="node-name">SOUTH HUB</text>
+                    <text x="108" y="353" class="node-detail" data-supply="south_hub">Supply 400</text>
+                  </g>
+                  <g class="community community-north">
+                    <circle cx="520" cy="84" r="25"></circle>
+                    <text x="520" y="90" class="community-icon">N</text>
+                    <text x="555" y="77" class="node-name" text-anchor="start">NORTHSIDE</text>
+                    <text x="555" y="93" class="node-detail" text-anchor="start">Need 800</text>
+                    <text x="555" y="109" class="allocation-label" data-allocation="north" text-anchor="start">—</text>
+                  </g>
+                  <g class="community community-central">
+                    <circle cx="520" cy="194" r="25"></circle>
+                    <text x="520" y="200" class="community-icon">C</text>
+                    <text x="555" y="187" class="node-name" text-anchor="start">CENTRAL</text>
+                    <text x="555" y="203" class="node-detail" text-anchor="start">Need 600</text>
+                    <text x="555" y="219" class="allocation-label" data-allocation="central" text-anchor="start">—</text>
+                  </g>
+                  <g class="community community-south">
+                    <circle cx="520" cy="304" r="25"></circle>
+                    <text x="520" y="310" class="community-icon">S</text>
+                    <text x="555" y="297" class="node-name" text-anchor="start">SOUTHSIDE</text>
+                    <text x="555" y="313" class="node-detail" text-anchor="start">Need 500</text>
+                    <text x="555" y="329" class="allocation-label" data-allocation="south" text-anchor="start">—</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="network-legend">
+                <span><i class="legend-line"></i> Possible route</span>
+                <span><i class="legend-dot"></i> x<sub>ij</sub> = crates on route</span>
+              </div>
+            </article>
 
-        <article class="panel model-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="panel-label">THE MATHEMATICAL MODEL</p>
-              <h3 id="modelHeading">Optimization model</h3>
-            </div>
-            <span class="model-tag">LIVE GUROBI LP · 1,000 CRATES</span>
-          </div>
-          <div class="model-content">
-            <div class="equation-block">
-              <span class="equation-label">DECISION VARIABLES</span>
-              <p class="equation">x<sub>ij</sub> = crates from hub <i>i</i> to community <i>j</i></p>
-            </div>
-            <div class="equation-block">
-              <span class="equation-label">OBJECTIVE <span class="constraint-badge existing">EXISTING</span></span>
-              <p class="equation">minimize <span class="math-emphasis">Σ c<sub>ij</sub>x<sub>ij</sub></span> <small>lowest delivery cost</small></p>
-            </div>
-            <div class="equation-block">
-              <span class="equation-label">CONSTRAINTS</span>
-              <ul class="constraint-list">
-                <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Ship only available supply</span><span class="constraint-badge existing">EXISTING</span></li>
-                <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Respect community demand</span><span class="constraint-badge existing">EXISTING</span></li>
-                <li class="constraint-row fairness-row" id="fairnessRow" hidden>
-                  <span class="constraint-check new-check">+</span>
-                  <span class="constraint-formula">Σ<sub>i</sub>x<sub>ij</sub> ≥ <strong id="constraintThreshold">25%</strong> · 1,000 crates <small>for each community j</small></span>
-                  <span class="constraint-badge new-badge">NEW</span>
-                </li>
-              </ul>
-            </div>
-            <div class="model-insight" id="modelInsight">
-              <span class="insight-icon" aria-hidden="true">✳</span>
-              <p id="insightText">Every route and demand is visible. The question is what “best” should mean.</p>
-              <button id="insightButton" class="text-button" type="button">A model note <span aria-hidden="true">+</span></button>
-            </div>
-          </div>
-        </article>
+            <article class="panel model-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-label">FROM STORY TO MATHEMATICS</p>
+                  <h3 id="modelHeading">Problem statement</h3>
+                </div>
+                <span class="model-tag">Gurobi · LP</span>
+              </div>
+              <div class="problem-content" id="problemPanel">
+                <p>Two hubs have <strong>1,000 crates</strong> to distribute. Northside, Central, and Southside need <strong>1,900 crates</strong> in total.</p>
+                <p>Each route has a different illustrative cost. <mark>Choose how much to send on each route</mark> without exceeding hub supply, community demand, or the <strong>1,400-unit budget</strong>.</p>
+                <div class="problem-prompt"><span aria-hidden="true">↳</span> What allocation delivers the most food?</div>
+              </div>
+              <div class="model-content" id="modelPanel" hidden>
+                <div class="equation-block decision-block">
+                  <span class="equation-label">DECISION VARIABLES</span>
+                  <p class="equation">x<sub>ij</sub> = crates sent from hub i to community j</p>
+                </div>
+                <div class="equation-block objective-block">
+                  <span class="equation-label">OBJECTIVE <span class="constraint-badge existing">SAME IN BOTH SOLVES</span></span>
+                  <p class="equation">maximize <span class="math-emphasis">Σ<sub>i,j</sub> x<sub>ij</sub></span> <small>total deliveries</small></p>
+                </div>
+                <div class="equation-block constraint-block">
+                  <span class="equation-label">CONSTRAINTS</span>
+                  <ul class="constraint-list">
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Σ<sub>j</sub> x<sub>ij</sub> ≤ supply<sub>i</sub></span><span class="constraint-badge existing">SUPPLY</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Σ<sub>i</sub> x<sub>ij</sub> ≤ demand<sub>j</sub></span><span class="constraint-badge existing">DEMAND</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>Σ<sub>i,j</sub> c<sub>ij</sub>x<sub>ij</sub> ≤ 1,400</span><span class="constraint-badge existing">BUDGET</span></li>
+                    <li class="constraint-row fairness-row" id="fairnessRow" hidden>
+                      <span class="constraint-check new-check">+</span>
+                      <span class="constraint-formula">Σ<sub>i</sub>x<sub>ij</sub> ≥ <strong id="constraintThreshold">15%</strong> · Σ<sub>i,j</sub>x<sub>ij</sub> <small>for every community j · share of actual deliveries</small></span>
+                      <span class="constraint-badge new-badge">NEW</span>
+                    </li>
+                  </ul>
+                </div>
+                <p class="model-footnote">c<sub>ij</sub> are illustrative route-cost units—not dollars. x<sub>ij</sub> ≥ 0.</p>
+                <div class="solve-row">
+                  <p id="solveStatus" aria-live="polite">Ready when you are. Review each route variable above.</p>
+                  <button class="solve-button" id="solveButton" type="button">Solve baseline <span aria-hidden="true">→</span></button>
+                </div>
+              </div>
+            </article>
           </section>
 
           <section class="results panel" id="resultsPanel" aria-label="Allocation results" hidden>
-        <div class="results-heading">
-          <div>
-            <p class="panel-label">THE DECISION, MADE VISIBLE</p>
-            <h3 id="resultsTitle">Original cost-optimal allocation</h3>
-          </div>
-          <div class="metric-group">
-            <div class="metric"><span>TOTAL COST UNITS</span><strong id="costMetric">—</strong></div>
-            <div class="metric"><span>LOWEST SHARE OF SUPPLY</span><strong id="serviceMetric">—</strong></div>
-          </div>
-        </div>
-        <p class="solver-error" id="solverError" role="alert" hidden></p>
-        <div class="allocation-list" id="allocationList">
-          <div class="allocation-row" data-community="north">
-            <span class="allocation-name"><i class="community-swatch north-swatch"></i>Northside</span>
-            <div class="bar-track"><div class="bar-fill north-fill" data-bar="north"></div></div>
-            <span class="allocation-value" data-value="north">—</span>
-          </div>
-          <div class="allocation-row" data-community="central">
-            <span class="allocation-name"><i class="community-swatch central-swatch"></i>Central</span>
-            <div class="bar-track"><div class="bar-fill central-fill" data-bar="central"></div></div>
-            <span class="allocation-value" data-value="central">—</span>
-          </div>
-          <div class="allocation-row" data-community="south">
-            <span class="allocation-name"><i class="community-swatch south-swatch"></i>Southside</span>
-            <div class="bar-track"><div class="bar-fill south-fill" data-bar="south"></div></div>
-            <span class="allocation-value" data-value="south">—</span>
-          </div>
-        </div>
-        <div class="comparison-note" id="comparisonNote" hidden>
-          <span class="comparison-arrow" aria-hidden="true">↗</span>
-          <p id="comparisonText"></p>
-        </div>
+            <div class="results-heading">
+              <div>
+                <p class="panel-label">THE DECISION, MADE VISIBLE</p>
+                <h3 id="resultsTitle">Allocation</h3>
+              </div>
+              <div class="metric-group">
+                <div class="metric"><span>TOTAL DELIVERED</span><strong id="deliveryMetric">—</strong></div>
+                <div class="metric"><span>BUDGET USED</span><strong id="costMetric">—</strong></div>
+              </div>
+            </div>
+            <p class="solver-error" id="solverError" role="alert" hidden></p>
+            <div class="allocation-list">
+              <div class="allocation-row"><span class="allocation-name"><i class="community-swatch north-swatch"></i>Northside</span><div class="bar-track"><div class="bar-fill north-fill" data-bar="north"></div></div><span class="allocation-value" data-value="north">—</span></div>
+              <div class="allocation-row"><span class="allocation-name"><i class="community-swatch central-swatch"></i>Central</span><div class="bar-track"><div class="bar-fill central-fill" data-bar="central"></div></div><span class="allocation-value" data-value="central">—</span></div>
+              <div class="allocation-row"><span class="allocation-name"><i class="community-swatch south-swatch"></i>Southside</span><div class="bar-track"><div class="bar-fill south-fill" data-bar="south"></div></div><span class="allocation-value" data-value="south">—</span></div>
+            </div>
+            <div class="comparison-note" id="comparisonNote" hidden><span class="comparison-arrow" aria-hidden="true">↗</span><p id="comparisonText"></p></div>
           </section>
 
           <section class="fairness-control" id="fairnessControl" hidden>
-        <div>
-          <label for="fairnessSlider">Minimum share per community</label>
-          <p>Adjust the new constraint and watch the same network respond.</p>
-        </div>
-        <div class="slider-wrap">
-          <input id="fairnessSlider" type="range" min="20" max="30" step="1" value="25" aria-describedby="sliderHint">
-          <div class="slider-meta"><span>20%</span><output id="fairnessOutput" for="fairnessSlider">25%</output><span>30%</span></div>
-        </div>
-        <span class="sr-only" id="sliderHint">Each community is guaranteed at least this percentage of all available crates.</span>
+            <div>
+              <label for="fairnessSlider">Minimum share of actual deliveries</label>
+              <p>Change the new rule, then explicitly re-solve the model.</p>
+            </div>
+            <div class="slider-wrap">
+              <input id="fairnessSlider" type="range" min="5" max="30" step="1" value="15" aria-describedby="sliderHint">
+              <div class="slider-meta"><span>5%</span><output id="fairnessOutput" for="fairnessSlider">15%</output><span>30%</span></div>
+            </div>
+            <button class="solve-button fairness-solve" id="fairnessSolveButton" type="button">Re-solve <span aria-hidden="true">→</span></button>
+            <span class="sr-only" id="sliderHint">Each community is guaranteed at least this percentage of all crates actually delivered.</span>
           </section>
         </div>
       </div>
 
       <footer class="presenter-controls">
         <button class="back-button" id="backButton" type="button" disabled><span aria-hidden="true">←</span> Back</button>
-        <button class="chat-toggle" id="chatToggle" type="button" aria-expanded="false" aria-controls="chatWindow">
-          <span aria-hidden="true">✳</span> Ask the model
-        </button>
         <span class="presenter-hint" id="presenterHint">Presenter controlled · advance when ready</span>
-        <button class="next-button" id="nextButton" type="button"><span id="nextLabel">Reveal the first answer</span><span aria-hidden="true">→</span></button>
+        <button class="next-button" id="nextButton" type="button"><span id="nextLabel">Take this problem to the model</span><span aria-hidden="true">→</span></button>
       </footer>
-
-      <aside class="chat-window" id="chatWindow" aria-label="Scripted model Q and A" hidden>
-        <header class="chat-header">
-          <div>
-            <p class="panel-label">PRESENTATION Q&amp;A</p>
-            <h2>Ask about the model</h2>
-          </div>
-          <button class="chat-close" id="chatClose" type="button" aria-label="Close model Q and A">×</button>
-        </header>
-        <p class="chat-disclaimer"><span class="scripted-dot"></span> Scripted demo · no LLM connected</p>
-        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
-          <div class="chat-message assistant-message">I can explain the current Gurobi allocation, cost, fairness floor, or sensitivity results.</div>
-        </div>
-        <div class="chat-suggestions" aria-label="Suggested questions">
-          <button type="button" data-question="Why did Southside get this allocation?">Why this allocation?</button>
-          <button type="button" data-question="What did the fairness constraint change?">What changed?</button>
-          <button type="button" data-question="What does sensitivity say about fairness?">Sensitivity?</button>
-        </div>
-        <form class="chat-form" id="chatForm">
-          <label class="sr-only" for="chatInput">Ask a question about this model</label>
-          <input id="chatInput" name="question" type="text" maxlength="240" placeholder="Ask about this result…" autocomplete="off" required>
-          <button type="submit" aria-label="Send question">Send</button>
-        </form>
-      </aside>
     </main>
     <script src="app.js"></script>
   </body>
