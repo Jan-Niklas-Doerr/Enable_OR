@@ -116,7 +116,7 @@
               <p class="panel-label">THE MATHEMATICAL MODEL</p>
               <h3 id="modelHeading">Optimization model</h3>
             </div>
-            <span class="model-tag">SIMULATED LP · 1,000 CRATES</span>
+            <span class="model-tag">LIVE GUROBI LP · 1,000 CRATES</span>
           </div>
           <div class="model-content">
             <div class="equation-block">
@@ -155,10 +155,11 @@
             <h3 id="resultsTitle">Original cost-optimal allocation</h3>
           </div>
           <div class="metric-group">
-            <div class="metric"><span>TOTAL COST</span><strong id="costMetric">$1,840</strong></div>
-            <div class="metric"><span>LEAST-SERVED AREA</span><strong id="serviceMetric">15%</strong></div>
+            <div class="metric"><span>TOTAL COST UNITS</span><strong id="costMetric">—</strong></div>
+            <div class="metric"><span>LOWEST SHARE OF SUPPLY</span><strong id="serviceMetric">—</strong></div>
           </div>
         </div>
+        <p class="solver-error" id="solverError" role="alert" hidden></p>
         <div class="allocation-list" id="allocationList">
           <div class="allocation-row" data-community="north">
             <span class="allocation-name"><i class="community-swatch north-swatch"></i>Northside</span>
@@ -178,7 +179,7 @@
         </div>
         <div class="comparison-note" id="comparisonNote" hidden>
           <span class="comparison-arrow" aria-hidden="true">↗</span>
-          <p>Same 1,000 crates. The model now protects a minimum share for every community.</p>
+          <p id="comparisonText"></p>
         </div>
           </section>
 
@@ -198,9 +199,36 @@
 
       <footer class="presenter-controls">
         <button class="back-button" id="backButton" type="button" disabled><span aria-hidden="true">←</span> Back</button>
+        <button class="chat-toggle" id="chatToggle" type="button" aria-expanded="false" aria-controls="chatWindow">
+          <span aria-hidden="true">✳</span> Ask the model
+        </button>
         <span class="presenter-hint" id="presenterHint">Presenter controlled · advance when ready</span>
         <button class="next-button" id="nextButton" type="button"><span id="nextLabel">Reveal the first answer</span><span aria-hidden="true">→</span></button>
       </footer>
+
+      <aside class="chat-window" id="chatWindow" aria-label="Scripted model Q and A" hidden>
+        <header class="chat-header">
+          <div>
+            <p class="panel-label">PRESENTATION Q&amp;A</p>
+            <h2>Ask about the model</h2>
+          </div>
+          <button class="chat-close" id="chatClose" type="button" aria-label="Close model Q and A">×</button>
+        </header>
+        <p class="chat-disclaimer"><span class="scripted-dot"></span> Scripted demo · no LLM connected</p>
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+          <div class="chat-message assistant-message">I can explain the current Gurobi allocation, cost, fairness floor, or sensitivity results.</div>
+        </div>
+        <div class="chat-suggestions" aria-label="Suggested questions">
+          <button type="button" data-question="Why did Southside get this allocation?">Why this allocation?</button>
+          <button type="button" data-question="What did the fairness constraint change?">What changed?</button>
+          <button type="button" data-question="What does sensitivity say about fairness?">Sensitivity?</button>
+        </div>
+        <form class="chat-form" id="chatForm">
+          <label class="sr-only" for="chatInput">Ask a question about this model</label>
+          <input id="chatInput" name="question" type="text" maxlength="240" placeholder="Ask about this result…" autocomplete="off" required>
+          <button type="submit" aria-label="Send question">Send</button>
+        </form>
+      </aside>
     </main>
     <script src="app.js"></script>
   </body>
