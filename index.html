@@ -21,33 +21,23 @@
         <nav class="story-nav" aria-label="Demonstration stages">
           <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
           <button class="stage-link is-active" data-stage="0" aria-current="step"><span>01</span> The challenge</button>
-          <button class="stage-link" data-stage="1"><span>02</span> Build the model</button>
-          <button class="stage-link" data-stage="2"><span>03</span> Add fairness</button>
+          <button class="stage-link" data-stage="1"><span>02</span> Baseline</button>
+          <button class="stage-link" data-stage="2"><span>03</span> Fairness</button>
+          <button class="stage-link" data-stage="3"><span>04</span> Route cost</button>
+          <button class="stage-link" data-stage="4"><span>05</span> More supply</button>
         </nav>
 
         <div class="story-column">
-          <section class="intro">
-            <p class="eyebrow">A FOOD-BANK NETWORK, RECONSIDERED</p>
-            <h1>One network.<br><span>Better decisions.</span></h1>
-            <p class="intro-copy">A live optimization story: define the problem, solve it, then change one rule and see what happens.</p>
-          </section>
-
-          <section class="stage-copy" aria-live="polite">
-            <div class="stage-kicker" id="stageKicker">THE CHALLENGE <span>01 / 03</span></div>
-            <h2 id="stageTitle">Three communities. One limited supply.</h2>
-            <p id="stageDescription">Two food hubs can deliver 1,000 crates to three communities requesting 1,900. Which routes should carry the food?</p>
-          </section>
-
           <section class="chat-card" aria-label="Simulated conversation">
             <div class="chat-card-heading">
               <div>
-                <p class="panel-label">MODEL ASSISTANT · SCRIPTED DIALOGUE</p>
-                <h3 id="chatTitle">Ask for the formulation</h3>
+                <p class="panel-label"><span id="stageKicker">THE CHALLENGE · 01 / 05</span> · MODEL ASSISTANT</p>
+                <h3 id="chatTitle">Ask me to build the model</h3>
               </div>
               <span class="scripted-dot" title="Scripted, solver-grounded demo"></span>
             </div>
             <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
-              <div class="chat-message assistant-message">Ask me to formulate the food-allocation problem. I’ll show the model Gurobi solves.</div>
+              <div class="chat-message assistant-message">I can turn the supply, demand, route costs, and budget into the optimization model used in this demonstration.</div>
             </div>
             <div class="chat-suggestions" id="chatSuggestions" aria-label="Suggested questions"></div>
             <form class="chat-form" id="chatForm">
@@ -143,6 +133,18 @@
                 </div>
                 <span class="model-tag">Gurobi · LP</span>
               </div>
+              <section class="fairness-control" id="fairnessControl" hidden>
+                <div>
+                  <label for="fairnessSlider">Set the minimum share for every community</label>
+                  <p id="fairnessStatus">Adjust the new rule, then solve to compare allocations.</p>
+                </div>
+                <div class="slider-wrap">
+                  <input id="fairnessSlider" type="range" min="5" max="30" step="1" value="15" aria-describedby="sliderHint">
+                  <div class="slider-meta"><span>5%</span><output id="fairnessOutput" for="fairnessSlider">15%</output><span>30%</span></div>
+                </div>
+                <button class="solve-button fairness-solve" id="fairnessSolveButton" type="button">Re-solve <span aria-hidden="true">→</span></button>
+                <span class="sr-only" id="sliderHint">Each community is guaranteed at least this percentage of all crates actually delivered.</span>
+              </section>
               <div class="problem-content" id="problemPanel">
                 <p>Two hubs have <strong>1,000 crates</strong> to distribute. Northside, Central, and Southside need <strong>1,900 crates</strong> in total.</p>
                 <p>Each route has a per-crate cost. <mark>Choose how much to send on each route</mark> without exceeding hub supply, community demand, or the <strong>1,400-unit budget</strong>.</p>
@@ -162,12 +164,29 @@
                   <p class="equation">maximize <span class="math-emphasis">x<sub>NN</sub> + x<sub>NC</sub> + x<sub>NS</sub> + x<sub>SN</sub> + x<sub>SC</sub> + x<sub>SS</sub></span></p>
                 </div>
                 <div class="equation-block constraint-block">
-                  <span class="equation-label">SUPPLY, DEMAND &amp; BUDGET CONSTRAINTS</span>
+                  <span class="equation-label">HUB SUPPLY CONSTRAINTS</span>
                   <ul class="constraint-list">
                     <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + x<sub>NC</sub> + x<sub>NS</sub> ≤ 600</span><span class="constraint-badge existing">NORTH HUB</span></li>
                     <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>SN</sub> + x<sub>SC</sub> + x<sub>SS</sub> ≤ 400</span><span class="constraint-badge existing">SOUTH HUB</span></li>
-                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + x<sub>SN</sub> ≤ 800 · x<sub>NC</sub> + x<sub>SC</sub> ≤ 600 · x<sub>NS</sub> + x<sub>SS</sub> ≤ 500</span><span class="constraint-badge existing">DEMAND</span></li>
+                  </ul>
+                </div>
+                <div class="equation-block">
+                  <span class="equation-label">COMMUNITY DEMAND CONSTRAINTS</span>
+                  <ul class="constraint-list">
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + x<sub>SN</sub> ≤ 800</span><span class="constraint-badge existing">NORTHSIDE</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NC</sub> + x<sub>SC</sub> ≤ 600</span><span class="constraint-badge existing">CENTRAL</span></li>
+                    <li class="constraint-row existing-row"><span class="constraint-check">✓</span><span>x<sub>NS</sub> + x<sub>SS</sub> ≤ 500</span><span class="constraint-badge existing">SOUTHSIDE</span></li>
+                  </ul>
+                </div>
+                <div class="equation-block">
+                  <span class="equation-label">TOTAL ROUTE-COST CONSTRAINT</span>
+                  <ul class="constraint-list">
                     <li class="constraint-row existing-row budget-row"><span class="constraint-check">✓</span><span>x<sub>NN</sub> + 3x<sub>NC</sub> + 4x<sub>NS</sub> + 3x<sub>SN</sub> + 2x<sub>SC</sub> + 3x<sub>SS</sub> ≤ 1,400</span><span class="constraint-badge existing">BUDGET</span></li>
+                  </ul>
+                </div>
+                <div class="equation-block" id="fairnessBlock" hidden>
+                  <span class="equation-label">NEW MINIMUM-SHARE CONSTRAINT</span>
+                  <ul class="constraint-list">
                     <li class="constraint-row fairness-row" id="fairnessRow" hidden>
                       <span class="constraint-check new-check">+</span>
                       <span class="constraint-formula">Σ<sub>i</sub>x<sub>ij</sub> ≥ <strong id="constraintThreshold">15%</strong> · Σ<sub>i,j</sub>x<sub>ij</sub> <small>for every community j · share of actual deliveries</small></span>
@@ -181,6 +200,48 @@
                   <button class="solve-button" id="solveButton" type="button">Solve baseline <span aria-hidden="true">→</span></button>
                 </div>
               </div>
+              <section class="scenario-content" id="routeScenarioPanel" hidden aria-labelledby="routeScenarioHeading">
+                <h3 id="routeScenarioHeading" class="scenario-heading">What if a route became cheaper?</h3>
+                <div class="scenario-intro">
+                  <p>Reduce one route’s cost by 25%, hold the budget and selected fairness floor constant, then let Gurobi re-optimize every route.</p>
+                  <p class="scenario-context">Compared with the optimized allocation at <strong data-current-floor>15%</strong> minimum share.</p>
+                </div>
+                <label class="scenario-field" for="routeSelect">Route to make more efficient
+                  <select id="routeSelect">
+                    <option value="north_hub|north">North Hub → Northside</option>
+                    <option value="north_hub|central">North Hub → Central</option>
+                    <option value="north_hub|south">North Hub → Southside</option>
+                    <option value="south_hub|north">South Hub → Northside</option>
+                    <option value="south_hub|central">South Hub → Central</option>
+                    <option value="south_hub|south">South Hub → Southside</option>
+                  </select>
+                </label>
+                <button class="solve-button scenario-button" id="routeScenarioButton" type="button">Re-optimize route costs <span aria-hidden="true">→</span></button>
+                <p class="scenario-status" id="routeScenarioStatus" aria-live="polite">Choose a route and run the scenario to see the new allocation.</p>
+                <div class="scenario-result" id="routeScenarioResult" hidden>
+                  <div class="scenario-metrics">
+                    <div class="scenario-metric"><span>DELIVERIES BEFORE</span><strong id="routeBefore">—</strong></div>
+                    <div class="scenario-metric"><span>DELIVERIES AFTER</span><strong id="routeAfter">—</strong></div>
+                    <div class="scenario-metric"><span>CHANGE</span><strong id="routeChange">—</strong></div>
+                  </div>
+                  <div class="scenario-allocation" id="routeAllocation"></div>
+                  <p class="scenario-footnote" id="routeFootnote"></p>
+                </div>
+              </section>
+              <section class="scenario-content" id="supplyScenarioPanel" hidden aria-labelledby="supplyScenarioHeading">
+                <h3 id="supplyScenarioHeading" class="scenario-heading">Would extra supply help?</h3>
+                <div class="scenario-intro">
+                  <p>Add 200 crates at one hub while keeping the same budget and fairness floor. Compare both locations to see whether extra supply can actually be used.</p>
+                  <p class="scenario-context">Compared with the optimized allocation at <strong data-current-floor>15%</strong> minimum share.</p>
+                </div>
+                <button class="solve-button scenario-button" id="supplyScenarioButton" type="button">Compare both hubs <span aria-hidden="true">→</span></button>
+                <p class="scenario-status" id="supplyScenarioStatus" aria-live="polite">Run the comparison to see which hub’s extra supply changes deliveries.</p>
+                <div class="scenario-result" id="supplyScenarioResult" hidden>
+                  <div class="supply-comparisons" id="supplyComparisons"></div>
+                  <div class="scenario-allocation" id="supplyAllocation"></div>
+                  <p class="scenario-footnote" id="supplyFootnote"></p>
+                </div>
+              </section>
             </article>
           </section>
 
@@ -204,18 +265,6 @@
             <div class="comparison-note" id="comparisonNote" hidden><span class="comparison-arrow" aria-hidden="true">↗</span><p id="comparisonText"></p></div>
           </section>
 
-          <section class="fairness-control" id="fairnessControl" hidden>
-            <div>
-              <label for="fairnessSlider">Minimum share of actual deliveries</label>
-              <p id="fairnessStatus">Change the new rule, then explicitly re-solve the model.</p>
-            </div>
-            <div class="slider-wrap">
-              <input id="fairnessSlider" type="range" min="5" max="30" step="1" value="15" aria-describedby="sliderHint">
-              <div class="slider-meta"><span>5%</span><output id="fairnessOutput" for="fairnessSlider">15%</output><span>30%</span></div>
-            </div>
-            <button class="solve-button fairness-solve" id="fairnessSolveButton" type="button">Re-solve <span aria-hidden="true">→</span></button>
-            <span class="sr-only" id="sliderHint">Each community is guaranteed at least this percentage of all crates actually delivered.</span>
-          </section>
         </div>
       </div>
 

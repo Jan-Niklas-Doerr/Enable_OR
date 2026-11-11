@@ -1,11 +1,13 @@
 # Food-bank allocation demonstration
 
-This presenter-led demo tells one continuous optimization story across three
-stages: frame the food-bank problem, solve a budget-capped allocation, and add
-a minimum-share fairness rule. The same network stays visible throughout.
-In the first stage, asking the scripted assistant to formulate the model
-reveals the equations and advances to the model tab. No solve is run until the
-presenter presses Solve; fairness changes also require an explicit re-solve.
+This presenter-led demo tells one continuous optimization story across five
+stages: frame the food-bank problem, solve a budget-capped allocation, add a
+controllable minimum-share rule, then explore route-cost and added-supply
+sensitivity in separate tabs. The same network stays visible throughout.
+Asking the scripted assistant to formulate the model reveals the equations
+and advances to the baseline tab. After the baseline solve, asking to introduce
+fairness opens the fairness tab, where the presenter sets the minimum share.
+Model solves and what-if comparisons remain explicit presenter actions.
 
 Run the local server from the `orllmbench` environment, then open
 `http://127.0.0.1:8000/`. Do not open `index.html` directly: the browser needs
@@ -54,9 +56,10 @@ extrapolating sensitivity values.
 
 The `/api/what-if` endpoint compares fresh Gurobi solves: it reduces each
 route's unit cost by a selected percentage, and separately adds a selected
-amount of supply at each hub while keeping the budget unchanged. The UI uses
-these comparisons for its conversational route-cost and added-supply answers;
-the recommended hub is determined by the current solve results.
+amount of supply at each hub while keeping the budget unchanged. The route-cost
+and added-supply tabs visualize delivery changes and community allocations on
+the network. Both compare scenarios at the currently selected fairness floor.
+The recommended route and hub are determined by the current solve results.
 
 ## Conversation and presentation
 
@@ -65,6 +68,7 @@ formulation is scripted to match the displayed supplies, demands, costs, and
 budget; Gurobi solves that corresponding LP when requested. Allocation and
 what-if answers use actual local solver results. This is a staged demonstration,
 not arbitrary natural-language-to-model generation. Responses appear in
-concise turns rather than character-by-character typing. The 16:9 desktop
-layout preserves the network, model, allocations, and conversation together,
-with a responsive stacked layout on smaller screens.
+concise turns rather than character-by-character typing. The desktop layout
+scales typography with the viewport and keeps the conversation beside the
+network; longer model and sensitivity content can scroll. Smaller screens use
+a responsive stacked layout.

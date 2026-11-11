@@ -483,3 +483,124 @@ h3, .chat-card-heading h3 { font-size: 17px; }
   .chat-form button { padding: 0 10px; font-size: 11px; }
   .chat-disclaimer { padding: 0 10px 6px; font-size: 8px; }
 }
+
+@media (min-width: 1100px) and (min-aspect-ratio: 3/2) {
+  .story-shell {
+    height: auto;
+    min-height: min(100vh, 56.25vw);
+    grid-template-rows: clamp(48px, 6vh, 72px) minmax(min-content, 1fr) 52px;
+    gap: clamp(6px, .8vh, 12px);
+  }
+  .presentation-grid {
+    grid-template-columns: minmax(270px, .68fr) minmax(0, 2fr);
+    grid-template-rows: 42px minmax(min-content, 1fr);
+    gap: clamp(8px, 1vw, 16px) clamp(18px, 2vw, 34px);
+  }
+  .story-column { padding-right: clamp(16px, 1.6vw, 28px); }
+  .story-nav { gap: clamp(12px, 1.8vw, 30px); }
+  .stage-link { font-size: clamp(12px, .78vw, 16px); }
+  .stage-link span { font-size: clamp(10px, .68vw, 14px); }
+  .demo-column { grid-template-rows: minmax(min-content, 1fr) auto auto; gap: clamp(8px, .8vh, 12px); }
+  .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(8px, .8vw, 14px); }
+  .network-panel { min-height: 0; }
+  .network-wrap { min-height: 240px; }
+  .network { max-height: none; }
+  .model-panel { max-height: calc(100vh - 220px); overflow-y: auto; }
+  .panel-heading { padding: clamp(12px, 1.1vw, 20px) clamp(14px, 1.2vw, 22px) 0; }
+  .panel-label { font-size: clamp(9px, .62vw, 12px); }
+  h3, .chat-card-heading h3 { font-size: clamp(16px, 1.05vw, 22px); }
+  .network-status, .model-tag { font-size: clamp(9px, .62vw, 12px); }
+  .network-legend { font-size: clamp(10px, .72vw, 14px); }
+  .node-name { font-size: clamp(18px, 1.25vw, 25px); }
+  .node-detail { font-size: clamp(17px, 1.15vw, 23px); }
+  .community-icon { font-size: clamp(22px, 1.8vw, 34px); }
+  .allocation-label { font-size: clamp(14px, .95vw, 20px); }
+  .route-label text { font-size: clamp(16px, 1.15vw, 23px); }
+  .problem-content { font-size: clamp(14px, .92vw, 18px); }
+  .route-costs { font-size: clamp(12px, .78vw, 16px); }
+  .model-content { padding: clamp(10px, .95vw, 18px) clamp(14px, 1.2vw, 22px); }
+  .equation-block { padding: clamp(8px, .7vw, 13px) 0; }
+  .equation-label { font-size: clamp(10px, .7vw, 14px); }
+  .equation { font-size: clamp(13px, .9vw, 18px); }
+  .constraint-row, .story-shell[data-stage="2"] .constraint-row {
+    min-height: 38px;
+    font-size: clamp(12px, .82vw, 17px);
+  }
+  .constraint-formula, .story-shell[data-stage="2"] .constraint-formula { font-size: clamp(12px, .82vw, 17px); }
+  .constraint-badge { font-size: clamp(9px, .63vw, 13px); }
+  .model-footnote { font-size: clamp(11px, .72vw, 14px); }
+  .solve-row p, .solve-row p, .solve-button { font-size: clamp(11px, .74vw, 15px); }
+  .results { padding: clamp(10px, .85vw, 16px); }
+  .metric span { font-size: clamp(8px, .58vw, 12px); }
+  .metric strong { font-size: clamp(17px, 1.2vw, 24px); }
+  .allocation-row { grid-template-columns: minmax(90px, 18%) 1fr minmax(142px, 32%); }
+  .allocation-name { font-size: clamp(11px, .78vw, 16px); }
+  .allocation-value { font-size: clamp(9px, .68vw, 14px); }
+  .fairness-control label { font-size: clamp(13px, .9vw, 18px); }
+  .fairness-control p, .slider-meta { font-size: clamp(10px, .7vw, 14px); }
+  .chat-card { flex: 0 1 auto; height: min(72vh, 780px); min-height: 0; max-height: 100%; }
+  .chat-card-heading { padding: clamp(12px, 1vw, 18px); }
+  .chat-card-heading .panel-label { font-size: clamp(9px, .62vw, 12px); }
+  .chat-messages { min-height: 0; gap: clamp(8px, .7vw, 13px); padding: clamp(12px, 1vw, 18px); }
+  .chat-message { max-width: 100%; padding: clamp(9px, .8vw, 15px); font-size: clamp(13px, .88vw, 18px); }
+  .chat-suggestions { gap: clamp(6px, .5vw, 10px); padding: 0 clamp(12px, 1vw, 18px) clamp(10px, .8vw, 15px); }
+  .chat-suggestions button { padding: clamp(6px, .5vw, 10px) clamp(9px, .65vw, 13px); font-size: clamp(11px, .72vw, 15px); }
+  .chat-form { padding: clamp(9px, .8vw, 15px); }
+  .chat-form input { padding: clamp(8px, .65vw, 13px); font-size: clamp(12px, .8vw, 16px); }
+  .chat-form button { padding: 0 clamp(10px, .8vw, 16px); font-size: clamp(11px, .75vw, 15px); }
+  .chat-disclaimer { padding: 0 clamp(12px, 1vw, 18px) clamp(8px, .65vw, 12px); font-size: clamp(8px, .56vw, 11px); }
+  .model-stage-note { display: block; margin: clamp(6px, .55vw, 10px) 0 0; font-size: clamp(12px, .78vw, 16px); }
+  .scenario-content { padding: clamp(14px, 1.1vw, 21px) clamp(16px, 1.2vw, 24px); }
+}
+
+.scenario-content { color: #56665b; }
+.scenario-heading { margin: 0 0 14px; font-size: clamp(19px, 1.5vw, 30px); }
+.scenario-intro { font-size: clamp(14px, .95vw, 19px); line-height: 1.55; }
+.scenario-intro p { margin: 0 0 12px; }
+.scenario-context { color: #879188; font-size: .9em; }
+.scenario-context strong { color: var(--green); }
+.scenario-field { display: grid; gap: 7px; margin: 18px 0 12px; color: #627067; font-size: clamp(13px, .85vw, 17px); font-weight: 600; }
+.scenario-field select { width: 100%; min-width: 0; color: var(--ink); background: white; border: 1px solid #dfe2d9; border-radius: 5px; padding: 10px 12px; font: inherit; }
+.scenario-button { margin: 8px 0; padding: 11px 15px; font-size: clamp(12px, .82vw, 16px); }
+.scenario-status { color: #78827b; font-size: clamp(12px, .8vw, 16px); line-height: 1.5; margin: 6px 0 12px; }
+.scenario-result { border-top: 1px solid #efeee8; margin-top: 14px; padding-top: 14px; }
+.scenario-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.scenario-metric { display: grid; gap: 5px; min-width: 0; }
+.scenario-metric span { color: #92988e; font: 10px var(--mono); letter-spacing: .06em; }
+.scenario-metric strong { color: #394b3e; font: 700 clamp(17px, 1.35vw, 28px) 'Segoe UI', sans-serif; }
+.scenario-metric strong.is-positive { color: #265746; }
+.scenario-metric strong.is-negative { color: #a64a3b; }
+.scenario-allocation { display: grid; gap: 12px; margin: 18px 0 12px; }
+.scenario-allocation-row { display: grid; grid-template-columns: minmax(68px, 22%) minmax(0, 1fr); gap: 5px 10px; align-items: center; }
+.scenario-allocation-label { color: #596b60; font-size: clamp(12px, .78vw, 16px); font-weight: 600; }
+.scenario-bar-pair { display: grid; gap: 4px; padding: 2px 0; }
+.scenario-base-fill, .scenario-new-fill { height: 7px; min-width: 2px; border-radius: 5px; }
+.scenario-base-fill { background: #c9cec5; }
+.scenario-new-fill { transition: width .65s cubic-bezier(.2, .8, .2, 1); }
+.scenario-allocation-value { grid-column: 2; color: #78827b; font: clamp(10px, .68vw, 14px) var(--mono); }
+.scenario-footnote { color: #92988e; font-size: clamp(11px, .72vw, 14px); line-height: 1.5; margin: 10px 0 0; }
+.supply-comparisons { display: grid; gap: 8px; margin-top: 14px; }
+.supply-choice { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 14px; width: 100%; padding: 11px 13px; color: #56665b; text-align: left; background: #fafaf6; border: 1px solid #e5e8df; border-radius: 6px; font: inherit; }
+.supply-choice strong { font-size: clamp(12px, .82vw, 16px); }
+.supply-choice span { color: #78827b; font-size: clamp(11px, .72vw, 14px); }
+.supply-choice.is-selected { border-color: #9cad98; background: #f0f4ed; box-shadow: inset 3px 0 #66836d; }
+
+@media (max-width: 1099px) {
+  .story-shell { height: auto; min-height: 100vh; aspect-ratio: auto; }
+  .story-column { min-height: 0; }
+  .chat-card { min-height: 260px; }
+  .workspace { align-items: start; }
+  .network-wrap { min-height: 230px; }
+  .model-panel { max-height: none; overflow: visible; }
+  .scenario-content { padding: 18px; }
+}
+
+@media (max-width: 700px) {
+  .stage-link { flex: 1 1 0; justify-content: center; min-width: 0; white-space: nowrap; }
+  .story-nav { gap: 3px; }
+  .chat-card { height: auto; min-height: clamp(280px, 42vh, 420px); max-height: none; }
+  .scenario-metrics { grid-template-columns: 1fr; gap: 12px; }
+  .scenario-allocation-row { grid-template-columns: 1fr; }
+  .scenario-allocation-value { grid-column: 1; }
+  .supply-choice { flex-direction: column; }
+}
