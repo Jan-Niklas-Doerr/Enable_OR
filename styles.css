@@ -497,7 +497,7 @@ h3, .chat-card-heading h3 { font-size: 17px; }
     gap: clamp(6px, .8vh, 12px);
   }
   .presentation-grid {
-    grid-template-columns: minmax(270px, .68fr) minmax(0, 2fr);
+    grid-template-columns: minmax(270px, .58fr) minmax(0, 2fr);
     grid-template-rows: 42px minmax(min-content, 1fr);
     gap: clamp(8px, 1vw, 16px) clamp(18px, 2vw, 34px);
   }
@@ -506,7 +506,7 @@ h3, .chat-card-heading h3 { font-size: 17px; }
   .stage-link { font-size: clamp(12px, .78vw, 16px); }
   .stage-link span { font-size: clamp(10px, .68vw, 14px); }
   .demo-column { grid-template-rows: minmax(min-content, 1fr) auto auto; gap: clamp(8px, .8vh, 12px); }
-  .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(8px, .8vw, 14px); }
+  .workspace { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: clamp(8px, .8vw, 14px); }
   .network-panel { min-height: 0; }
   .network-wrap { min-height: 240px; overflow: hidden; }
   .network { max-width: 100%; max-height: 100%; min-width: 0; min-height: 0; object-fit: contain; }
