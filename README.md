@@ -3,7 +3,8 @@
 This presenter-led demo tells one continuous optimization story across five
 stages: frame the food-bank problem, solve a budget-capped allocation, add a
 controllable minimum-share rule, then explore route-cost and added-supply
-sensitivity in separate tabs. The same network stays visible throughout.
+sensitivity in separate tabs. The same network stays visible throughout, with
+per-crate route costs and correctly subscripted flow variables on its edges.
 Asking the scripted assistant to formulate the Python/Gurobi model reveals the
 equations and advances to the baseline tab. After the baseline solve, asking to
 introduce fairness opens the fairness tab, where the presenter sets the minimum share.
@@ -67,8 +68,8 @@ The conversation is simulated and makes no external LLM calls. Its model
 formulation is scripted to match the displayed supplies, demands, costs, and
 budget; Gurobi solves that corresponding LP when requested. Allocation and
 what-if answers use actual local solver results. This is a staged demonstration,
-not arbitrary natural-language-to-model generation. Responses appear in
-concise turns rather than character-by-character typing. The desktop layout
-scales typography with the viewport and keeps the conversation beside the
-network; longer model and sensitivity content can scroll. Smaller screens use
-a responsive stacked layout.
+not arbitrary natural-language-to-model generation. Responses pause briefly,
+appear word by word, and remain on screen before presenter-led stage transitions.
+The desktop layout scales typography with the viewport and keeps the
+conversation beside the network; longer model and sensitivity content can
+scroll. Smaller screens use a responsive stacked layout.

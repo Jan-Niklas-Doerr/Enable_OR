@@ -99,11 +99,14 @@ h3 { font: 700 14px/1.3 'Segoe UI', sans-serif; letter-spacing: -.025em; margin:
 .community-north .allocation-label { fill: #bf6842; }
 .community-central .allocation-label { fill: #526a97; }
 .community-south .allocation-label { fill: #99772e; }
-.route-label { opacity: 0; transition: opacity .3s ease; }
-.network.model-visible .route-label { opacity: 1; }
+.route-label { opacity: 1; }
 .route-label rect { fill: #fffefa; stroke: #e6e5dc; stroke-width: .8; }
 .route-label text { fill: #78827b; font: 8px var(--mono); text-anchor: middle; dominant-baseline: middle; }
-.network.has-solution .route-label.has-flow text { fill: var(--green-dark); font-weight: 700; }
+.route-label .route-cost { fill: #92988e; font-size: 7px; }
+.route-label .route-flow { opacity: 0; transition: opacity .3s ease; }
+.network.model-visible .route-label .route-flow { opacity: 1; }
+.route-label .route-subscript { font-size: .68em; baseline-shift: sub; }
+.network.has-solution .route-label.has-flow .route-flow { fill: var(--green-dark); font-weight: 700; }
 .route-label.has-flow rect { stroke: #cbd9c9; fill: #f4f7f1; }
 .network-legend { border-top: 1px solid #efeee8; margin: 0 17px; padding: 9px 0 11px; display: flex; gap: 18px; color: #92988f; font-size: 9px; }
 .legend-line { display: inline-block; vertical-align: middle; width: 16px; border-top: 1.5px dashed #b8c2b5; margin-right: 5px; }
@@ -363,8 +366,9 @@ h3, .chat-card-heading h3 { font-size: 17px; }
 .node-detail { font-size: 17px; }
 .community-icon { font-size: 23px; }
 .allocation-label { font-size: 13px; }
-.route-label rect { x: -75px; y: -16px; width: 150px; height: 32px; }
-.route-label text { font-size: 18px; }
+.route-label rect { x: -68px; y: -20px; width: 136px; height: 40px; }
+.route-label .route-cost { font-size: 10px; }
+.route-label .route-flow { font-size: 14px; }
 .problem-content { padding: 24px 22px; font-size: 15px; }
 .route-costs { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; border-top: 1px solid #efeee8; padding-top: 13px; margin-top: 15px; color: #78827b; font-size: 12px; line-height: 1.5; }
 .route-costs strong { color: #3e5748; font-weight: 600; }
@@ -440,6 +444,7 @@ h3, .chat-card-heading h3 { font-size: 17px; }
 .story-shell[data-stage="2"] .solve-row { display: none; }
 .story-shell[data-stage="2"] .model-content { padding-top: 6px; }
 .story-shell[data-stage="2"] .constraint-block { padding-top: 6px; }
+.story-shell[data-stage="2"] .existing-constraints { display: none; }
 .story-shell[data-stage="2"] .constraint-row { min-height: 27px; font-size: 12px; }
 .story-shell[data-stage="2"] .constraint-formula { font-size: 12px; }
 
@@ -503,8 +508,8 @@ h3, .chat-card-heading h3 { font-size: 17px; }
   .demo-column { grid-template-rows: minmax(min-content, 1fr) auto auto; gap: clamp(8px, .8vh, 12px); }
   .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(8px, .8vw, 14px); }
   .network-panel { min-height: 0; }
-  .network-wrap { min-height: 240px; }
-  .network { max-height: none; }
+  .network-wrap { min-height: 240px; overflow: hidden; }
+  .network { max-width: 100%; max-height: 100%; min-width: 0; min-height: 0; object-fit: contain; }
   .model-panel { max-height: calc(100vh - 220px); overflow-y: auto; }
   .panel-heading { padding: clamp(12px, 1.1vw, 20px) clamp(14px, 1.2vw, 22px) 0; }
   .panel-label { font-size: clamp(9px, .62vw, 12px); }
@@ -515,7 +520,8 @@ h3, .chat-card-heading h3 { font-size: 17px; }
   .node-detail { font-size: clamp(17px, 1.15vw, 23px); }
   .community-icon { font-size: clamp(22px, 1.8vw, 34px); }
   .allocation-label { font-size: clamp(14px, .95vw, 20px); }
-  .route-label text { font-size: clamp(16px, 1.15vw, 23px); }
+  .route-label .route-cost { font-size: clamp(14px, .85vw, 17px); }
+  .route-label .route-flow { font-size: clamp(14px, .85vw, 17px); }
   .problem-content { font-size: clamp(14px, .92vw, 18px); }
   .route-costs { font-size: clamp(12px, .78vw, 16px); }
   .model-content { padding: clamp(10px, .95vw, 18px) clamp(14px, 1.2vw, 22px); }
@@ -551,6 +557,21 @@ h3, .chat-card-heading h3 { font-size: 17px; }
   .chat-disclaimer { padding: 0 clamp(12px, 1vw, 18px) clamp(8px, .65vw, 12px); font-size: clamp(8px, .56vw, 11px); }
   .model-stage-note { display: block; margin: clamp(6px, .55vw, 10px) 0 0; font-size: clamp(12px, .78vw, 16px); }
   .scenario-content { padding: clamp(14px, 1.1vw, 21px) clamp(16px, 1.2vw, 24px); }
+}
+
+@keyframes typing-caret {
+  50% { opacity: 0; }
+}
+
+.chat-message.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: .42em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: typing-caret .9s steps(2, end) infinite;
 }
 
 .scenario-content { color: #56665b; }

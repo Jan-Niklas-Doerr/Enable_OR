@@ -129,8 +129,7 @@ function renderSolution(solution) {
     const [hub, community] = label.dataset.route.split('-');
     const key = `${hub}-${community}`;
     const crates = solution.flows[hub][community];
-    label.querySelector('text').textContent =
-      `x_${routeNotation[key]} = ${formatNumber(crates, 1)}`;
+    label.querySelector('[data-route-flow-value]').textContent = formatNumber(crates, 1);
     label.classList.toggle('has-flow', crates > 1e-6);
     document.querySelector(`[data-route-line="${key}"]`).classList.toggle('has-flow', crates > 1e-6);
   });
@@ -168,15 +167,6 @@ function renderSolution(solution) {
   }
 }
 
-const routeNotation = {
-  'north_hub-north': 'NN',
-  'north_hub-central': 'NC',
-  'north_hub-south': 'NS',
-  'south_hub-north': 'SN',
-  'south_hub-central': 'SC',
-  'south_hub-south': 'SS',
-};
-
 function renderSuggestions(questions) {
   chatSuggestions.replaceChildren();
   questions.forEach((question) => {
@@ -213,8 +203,7 @@ function renderNetworkAllocation(flows, supply) {
       allocations[community] += crates;
       const key = `${hub}-${community}`;
       const label = document.querySelector(`.route-label[data-route="${key}"]`);
-      label.querySelector('text').textContent =
-        `x_${routeNotation[key]} = ${formatNumber(crates, 1)}`;
+      label.querySelector('[data-route-flow-value]').textContent = formatNumber(crates, 1);
       label.classList.toggle('has-flow', crates > 1e-6);
       document.querySelector(`[data-route-line="${key}"]`).classList.toggle('has-flow', crates > 1e-6);
     });
@@ -241,12 +230,26 @@ function addChatMessage(text, role) {
   return message;
 }
 
+async function addAssistantResponse(text) {
+  const message = addChatMessage('', 'assistant');
+  message.classList.add('is-typing');
+  message.setAttribute('aria-live', 'off');
+  const words = text.match(/\S+\s*/g) || [];
+  for (const word of words) {
+    message.textContent += word;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    await wait(70);
+  }
+  message.classList.remove('is-typing');
+  message.setAttribute('aria-live', 'polite');
+}
+
 function addConversationTurn(question, answer) {
   conversationQueue = conversationQueue.then(async () => {
     await wait(180);
     addChatMessage(question, 'user');
-    await wait(220);
-    addChatMessage(answer, 'assistant');
+    await wait(1800);
+    await addAssistantResponse(answer);
   });
   return conversationQueue;
 }
@@ -276,7 +279,7 @@ function renderStage(stage, includeStageDialogue = true) {
   document.getElementById('modelHeading').textContent = content.modelHeading;
   document.getElementById('modelStageNote').textContent =
     currentStage === 2
-      ? 'The objective, network, supply, demand, and budget stay the same.'
+      ? 'Only change from baseline: the minimum-share constraint.'
       : currentStage >= 3
         ? `Compare a new solve using the selected ${slider.value}% fairness floor.`
         : '';
@@ -760,18 +763,18 @@ async function askModel(question) {
       'thinking',
     );
     try {
+      await wait(2000);
       const answer = await answerModelQuestion(trimmed);
-      await wait(180);
       thinking.remove();
-      addChatMessage(answer, 'assistant');
+      await addAssistantResponse(answer);
       if (asksForModel && currentStage === 0) {
-        await wait(500);
+        await wait(1800);
         renderStage(1, false);
       } else if (shouldAdvanceToFairness && currentStage === 1) {
-        await wait(500);
+        await wait(1800);
         renderStage(2, false);
       } else if (nextScenarioStage !== null && currentStage === 2) {
-        await wait(500);
+        await wait(1800);
         renderStage(nextScenarioStage, false);
       }
     } catch (error) {
